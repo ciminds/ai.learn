@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth scroll-pt-32">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Power User - Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fl-pink': '#de00a5',
+                        'fl-pink-hover': '#b80089',
+                        'fl-dark': '#201026',
+                        'fl-gray-light': '#f5f5f5',
+                        'fl-gray-border': '#e0e0e0',
+                        'fl-text': '#222222',
+                        'fl-text-light': '#555555',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px rgba(0,0,0,0.05), 0 10px 15px rgba(0,0,0,0.02)',
+                        'sticky': '0 2px 10px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #222222; }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+        @keyframes sweep {
+            0%    {opacity: 0; margin-top: -10px}
+            100%  {opacity: 1; margin-top: 0px}
+        }
+        .hero-clip {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 4vw));
+        }
+        /* Modal Animation Infrastructure */
+        .modal-overlay {
+            transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
+        }
+        .modal-content-container {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out;
+        }
+        .modal-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .modal-hidden .modal-content-container {
+            transform: scale(0.95) translateY(15px);
+        }
+
+        /* Scoped CSS for Authentication Modal */
+        .auth-overlay {
+            --brand:#ffffff;
+            --brand-hover:#e4e4e7;
+            --brand-border:rgba(255,255,255,0.3);
+            --bg:#09090b; 
+            --s2:#121214;
+            --s3:#18181b;
+            --s4:#27272a;
+            --t1:#fafafa;
+            --t2:#a1a1aa;
+            --t3:#71717a;
+            --b1:rgba(255,255,255,0.08);
+            --b2:rgba(255,255,255,0.12);
+            --fh:'Inter',sans-serif;
+            --fb:'Inter',sans-serif;
+            --r:12px;
+            --rs:8px;
+            --rl:18px;
+            --rxl:24px;
+            
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: var(--bg);
+            color: var(--t1);
+            font-family: var(--fb);
+            display: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        .auth-overlay.active { display: block; }
+        .auth-overlay *,.auth-overlay *::before,.auth-overlay *::after { box-sizing:border-box; }
+        .auth-overlay ::selection { background:rgba(255,255,255,0.15); }
+
+        .auth-overlay .shell {
+            display:flex;
+            height:100vh;
+            width:100vw;
+            padding:8px;
+            gap:8px;
+            background:var(--bg);
+            overflow:hidden;
+            position:relative;
+        }
+
+        .auth-overlay .hero {
+            position:relative;
+            width:52%;
+            flex-shrink:0;
+            height:100%;
+            border-radius:var(--rxl);
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            justify-content:flex-end;
+            padding:32px 44px 44px;
+        }
+
+        .auth-overlay .hero video {
+            position:absolute;
+            inset:0;
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            z-index:0;
+        }
+
+        .auth-overlay .hero-scrim {
+            position:absolute;
+            inset:0;
+            z-index:1;
+            background:linear-gradient(to top,rgba(9,9,11,0.95) 0%,rgba(9,9,11,0.4) 50%,rgba(9,9,11,0.05) 100%);
+        }
+
+        .auth-overlay .hero-logo {
+            position:absolute;
+            top:32px;
+            left:44px;
+            z-index:10;
+            font-family:var(--fh);
+            font-size:clamp(55px, 7vw, 90px);
+            font-weight:800;
+            letter-spacing:-.05em;
+            color:var(--t1);
+            opacity:0;
+            animation:authUp .5s .1s cubic-bezier(.22,.68,0,1.2) forwards;
+        }
+
+        .auth-overlay .hero-body {
+            position:relative;
+            z-index:2;
+            max-width:340px;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .auth-overlay .h1 {
+            font-family:var(--fh);
+            font-size:clamp(28px,2.8vw,42px);
+            font-weight:800;
+            line-height:1.08;
+            letter-spacing:-.03em;
+            color:#fff;
+            margin-bottom:8px;
+            opacity:0;
+            transform:translateY(12px);
+            animation:authUp .55s .22s cubic-bezier(.22,.68,0,1.2) forwards;
+        }
+        .auth-overlay .h1 em {font-style:normal;color:var(--t2)}
+
+        .auth-overlay .form-col {
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px 32px;
+            overflow:hidden;
+            height:100%;
+        }
+
+        .auth-overlay .form-box {
+            width:100%;
+            max-width:400px;
+            opacity:0;
+            transform:translateY(16px);
+            animation:authUp .6s .45s cubic-bezier(.22,.68,0,1.2) forwards;
+        }
+
+        .auth-overlay .form-title {
+            font-family:var(--fh);
+            font-size:clamp(20px,2vw,28px);
+            font-weight:800;
+            letter-spacing:-.03em;
+            line-height:1.15;
+            color:var(--t1);
+            margin-bottom:4px;
+        }
+
+        .auth-overlay .form-sub {
+            font-size:13px;
+            font-weight:400;
+            color:var(--t3);
+            margin-bottom:14px;
+            line-height:1.5;
+        }
+
+        .auth-overlay .socials {
+            display:grid;
+            grid-template-columns:1fr;
+            gap:8px;
+            margin-bottom:16px;
+        }
+
+        .auth-overlay .soc-btn {
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            height:40px;
+            background:var(--s3);
+            border:1px solid var(--b2);
+            border-radius:var(--r);
+            font-family:var(--fb);
+            font-size:13px;
+            font-weight:500;
+            color:var(--t1);
+            cursor:pointer;
+            transition:all .15s ease;
+            outline:none;
+        }
+        .auth-overlay .soc-btn:hover {
+            background:var(--s4);
+            border-color:var(--brand-border);
+        }
+        .auth-overlay .soc-btn:focus-visible {
+            border-color:var(--brand-border);
+            box-shadow:0 0 0 2px rgba(255,255,255,0.1);
+        }
+        .auth-overlay .soc-btn:active {transform:scale(.98)}
+        .auth-overlay .soc-btn svg {width:16px;height:16px;flex-shrink:0}
+
+        .auth-overlay .div-row {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:16px;
+        }
+        .auth-overlay .div-line {flex:1;height:1px;background:var(--b1)}
+        .auth-overlay .div-txt {
+            font-family:var(--fh);
+            font-size:10px;
+            font-weight:600;
+            letter-spacing:.1em;
+            text-transform:uppercase;
+            color:var(--t3);
+            white-space:nowrap;
+        }
+
+        .auth-overlay .f-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+            margin-bottom:10px;
+        }
+
+        .auth-overlay .f-grp {
+            display:flex;
+            flex-direction:column;
+            gap:5px;
+            margin-bottom:10px;
+        }
+        .auth-overlay .f-grp:last-child {margin-bottom:0}
+
+        .auth-overlay label {
+            font-family:var(--fh);
+            font-size:11px;
+            font-weight:600;
+            color:var(--t2);
+            letter-spacing:.02em;
+        }
+
+        .auth-overlay .iw {position:relative}
+
+        .auth-overlay input[type=text],
+        .auth-overlay input[type=email],
+        .auth-overlay input[type=password],
+        .auth-overlay select {
+            width:100%;
+            height:40px;
+            background:var(--s3);
+            border:1px solid var(--b1);
+            border-radius:var(--r);
+            padding:0 14px;
+            font-family:var(--fb);
+            font-size:13px;
+            font-weight:400;
+            color:var(--t1);
+            outline:none;
+            transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;
+            -webkit-appearance:none;
+            appearance:none;
+            margin: 0;
+        }
+        .auth-overlay input[type=text]:hover,
+        .auth-overlay input[type=email]:hover,
+        .auth-overlay input[type=password]:hover,
+        .auth-overlay select:hover {
+            border-color:var(--b2);
+        }
+        .auth-overlay input[type=text]:focus,
+        .auth-overlay input[type=email]:focus,
+        .auth-overlay input[type=password]:focus,
+        .auth-overlay select:focus {
+            border-color:var(--brand-border);
+            background:var(--s4);
+            box-shadow:0 0 0 2px rgba(255,255,255,0.05);
+        }
+        .auth-overlay input::placeholder {color:var(--t3); opacity: 0.85;}
+        .auth-overlay select option {background:var(--s3); color:var(--t1);}
+        .auth-overlay select:invalid {color:var(--t3);}
+
+        .auth-overlay .pwd-i {padding-right:42px}
+
+        .auth-overlay .eye {
+            position:absolute;
+            right:10px;top:50%;
+            transform:translateY(-50%);
+            background:none;border:none;
+            cursor:pointer;
+            color:var(--t3);
+            padding:4px;
+            display:flex;align-items:center;
+            transition:color .15s ease;
+            border-radius:var(--rs);
+        }
+        .auth-overlay .eye:hover {color:var(--t1); background:var(--b1);}
+        .auth-overlay .eye:focus-visible {
+            outline:none;
+            box-shadow:0 0 0 2px rgba(255,255,255,0.1);
+        }
+        .auth-overlay .eye svg {width:15px;height:15px}
+
+        .auth-overlay .hint {
+            font-size:11px;
+            color:var(--t3);
+            margin-top:2px;
+        }
+
+        .auth-overlay .fields-wrap {margin-bottom:16px}
+
+        .auth-overlay .sub-btn {
+            width:100%;
+            height:44px;
+            background:var(--brand);
+            border:none;
+            border-radius:var(--r);
+            font-family:var(--fh);
+            font-size:14px;
+            font-weight:600;
+            color:#000;
+            cursor:pointer;
+            letter-spacing:.02em;
+            transition:all .15s ease;
+            margin-bottom:12px;
+        }
+        .auth-overlay .sub-btn:hover {
+            background:var(--brand-hover);
+            transform:translateY(-1px);
+        }
+        .auth-overlay .sub-btn:active {
+            transform:scale(.985);
+        }
+        .auth-overlay .sub-btn:focus-visible {
+            outline:none;
+            box-shadow:0 0 0 3px var(--bg), 0 0 0 5px var(--brand);
+        }
+
+        .auth-overlay .foot {
+            text-align:center;
+            font-size:12.5px;
+            color:var(--t3);
+        }
+        .auth-overlay .foot a {
+            color:var(--t1);
+            text-decoration:none;
+            font-weight:500;
+            transition:color .15s ease;
+            cursor: pointer;
+        }
+        .auth-overlay .foot a:hover {color:var(--t2)}
+
+        @keyframes authUp{to{opacity:1;transform:translateY(0)}}
+
+        /* ── Mobile auth redesign (max 767px) ──────────────────────────────────
+           On small screens: full-screen dark bottom-sheet style, no hero panel,
+           matching the attached MOBILE_UI_LOGINUP design (black bg, lime accents,
+           rounded inputs, smooth fade-in). Desktop stays exactly the same.
+        ──────────────────────────────────────────────────────────────────────── */
+        @media (max-width: 767px) {
+
+            /* Hide the hero video panel entirely */
+            .auth-overlay .hero { display: none !important; }
+
+            /* Overlay: full screen, Y scrollable only */
+            .auth-overlay {
+                overflow-x: hidden;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Shell: column, full height, scrollable */
+            .auth-overlay .shell {
+                flex-direction: column;
+                padding: 0;
+                overflow-x: hidden;
+                overflow-y: auto;
+                height: 100%;
+                min-height: 100%;
+                width: 100%;
+            }
+
+            /* Form column: fills screen, no fixed min-height that causes overflow */
+            .auth-overlay .form-col {
+                flex: 1 0 auto;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                padding: 0;
+                align-items: stretch;
+                justify-content: flex-start;
+                overflow: visible;
+            }
+
+            /* Form box — safe padding including notch/home bar area */
+            .auth-overlay .form-box {
+                width: 100%;
+                max-width: 100%;
+                padding: 52px 20px max(48px, env(safe-area-inset-bottom, 48px));
+                animation: mobileAuthIn 0.35s cubic-bezier(.22,.68,0,1.1) forwards;
+                overflow: visible;
+                box-sizing: border-box;
+            }
+
+            @keyframes mobileAuthIn {
+                from { opacity: 0; transform: translateY(18px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            /* Brand header above title */
+            .auth-overlay .form-box::before {
+                content: 'CI MINDS';
+                display: block;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.2em;
+                color: var(--t3);
+                text-transform: uppercase;
+                margin-bottom: 10px;
+            }
+
+            /* Bigger title on mobile */
+            .auth-overlay .form-title {
+                font-size: 28px;
+                margin-bottom: 6px;
+            }
+
+            .auth-overlay .form-sub {
+                font-size: 13px;
+                color: var(--t3);
+                margin-bottom: 28px;
+                line-height: 1.6;
+            }
+
+            /* Google button — taller, more prominent */
+            .auth-overlay .soc-btn {
+                height: 48px;
+                border-radius: 14px;
+                font-size: 14px;
+                font-weight: 500;
+                border: 1px solid rgba(255,255,255,0.12);
+                background: #111113;
+            }
+            .auth-overlay .soc-btn:active { transform: scale(.97); }
+
+            /* Divider */
+            .auth-overlay .div-row { margin: 20px 0; }
+            .auth-overlay .div-txt { font-size: 10px; letter-spacing: .12em; }
+
+            /* Input fields — taller, rounder */
+            .auth-overlay input[type=text],
+            .auth-overlay input[type=email],
+            .auth-overlay input[type=password],
+            .auth-overlay select {
+                height: 48px;
+                border-radius: 14px;
+                font-size: 14px;
+                padding: 0 16px;
+                background: #111113;
+                border-color: rgba(255,255,255,0.1);
+            }
+            .auth-overlay input[type=text]:focus,
+            .auth-overlay input[type=email]:focus,
+            .auth-overlay input[type=password]:focus,
+            .auth-overlay select:focus {
+                border-color: #C6FF00;
+                box-shadow: 0 0 0 2px rgba(198,255,0,0.12);
+                background: #111113;
+            }
+
+            /* Name fields stack vertically on mobile */
+            .auth-overlay .f-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .auth-overlay .f-grid .f-grp { margin-bottom: 12px !important; }
+
+            /* Labels */
+            .auth-overlay label {
+                font-size: 11px;
+                color: rgba(255,255,255,0.45);
+                letter-spacing: .05em;
+            }
+
+            /* Hint text */
+            .auth-overlay .hint { font-size: 11px; }
+
+            /* Submit button — taller, full radius */
+            .auth-overlay .sub-btn {
+                height: 48px;
+                border-radius: 14px;
+                font-size: 15px;
+                font-weight: 700;
+                letter-spacing: .01em;
+                margin-top: 4px;
+                margin-bottom: 16px;
+                /* Lime accent on mobile matching new design */
+                background: #C6FF00;
+                color: #000;
+            }
+            .auth-overlay .sub-btn:hover { background: #d4ff33; transform: none; }
+            .auth-overlay .sub-btn:active { transform: scale(.98); }
+
+            /* Footer toggle text */
+            .auth-overlay .foot { font-size: 13px; padding-top: 8px; }
+            .auth-overlay .foot a { color: #C6FF00; font-weight: 600; }
+            .auth-overlay .foot a:hover { color: #d4ff33; }
+
+            /* Back/close button — top-left on mobile */
+            .auth-overlay .auth-close-btn {
+                top: 16px;
+                right: 16px;
+                width: 32px;
+                height: 32px;
+                background: rgba(255,255,255,0.06);
+                border-color: rgba(255,255,255,0.1);
+            }
+
+            /* Password eye icon adjusts for taller input */
+            .auth-overlay .eye { right: 14px; }
+
+            /* Fields spacing */
+            .auth-overlay .f-grp { margin-bottom: 14px; }
+            .auth-overlay .fields-wrap { margin-bottom: 20px; }
+        }
+
+        .auth-overlay .auth-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #a1a1aa;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+        .auth-overlay .auth-close-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-white antialiased overflow-x-hidden min-h-screen flex flex-col">
+
+    <header class="w-full bg-white border-b border-fl-gray-border sticky top-0 z-50 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-6 lg:gap-8">
+                <div class="font-bold text-2xl tracking-tighter text-fl-dark shrink-0">CI MINDS</div>
+                <nav class="hidden md:flex gap-4 lg:gap-6 font-semibold text-sm">
+                    <a href="#" data-modal-target="subjects" class="hover:text-fl-pink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink rounded">Subjects</a>
+                    <a href="#" data-modal-target="courses" class="hover:text-fl-pink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink rounded">Courses</a>
+                </nav>
+            </div>
+            
+            <div id="auth-header-zone" class="flex items-center gap-2 sm:gap-3 text-sm font-semibold">
+                <!-- Sign In: visible on ALL screen sizes -->
+                <button type="button" onclick="openAuthModal(true)" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded text-fl-dark hover:text-fl-pink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink">Sign In</button>
+                <!-- Sign Up: visible on ALL screen sizes, styled as pill button -->
+                <button type="button" onclick="openAuthModal(false)" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-fl-pink text-white rounded font-bold hover:bg-fl-pink-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink active:scale-[0.97]">Sign Up</button>
+                <!-- Hamburger only for nav links on mobile -->
+                <button type="button" onclick="toggleLandingMobileMenu()" class="md:hidden p-2 text-fl-dark hover:text-fl-pink transition-colors focus:outline-none rounded-md" aria-label="Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="landing-mobile-menu" class="hidden absolute top-16 left-0 w-full bg-white border-b border-fl-gray-border shadow-lg z-40 md:hidden flex-col divide-y divide-fl-gray-border">
+            <div class="px-4 py-3 flex flex-col gap-3">
+                <a href="#" data-modal-target="subjects" class="text-sm font-semibold text-fl-dark hover:text-fl-pink transition-colors">Subjects</a>
+                <a href="#" data-modal-target="courses" class="text-sm font-semibold text-fl-dark hover:text-fl-pink transition-colors">Courses</a>
+            </div>
+            <div id="mobile-auth-zone" class="px-4 py-4 flex flex-col gap-3 bg-fl-gray-light">
+                <button type="button" onclick="openAuthModal(true); toggleLandingMobileMenu();" class="w-full border border-fl-pink text-fl-pink text-sm font-bold py-3 rounded text-center transition-colors hover:bg-fl-pink hover:text-white active:scale-[0.98]">Sign In</button>
+                <button type="button" onclick="openAuthModal(false); toggleLandingMobileMenu();" class="w-full bg-fl-pink text-white text-sm font-bold py-3 rounded text-center transition-colors hover:bg-fl-pink-hover active:scale-[0.98]">Sign Up</button>
+                <button type="button" onclick="handleGetCertified(); toggleLandingMobileMenu();" class="w-full bg-fl-dark text-white text-sm font-bold py-3 rounded text-center transition-colors active:scale-[0.98]">Get Certified →</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-fl-dark text-white pt-10 pb-20 sm:pt-14 sm:pb-28 lg:pt-16 lg:pb-32 px-4 sm:px-6 lg:px-8 hero-clip relative">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div class="lg:col-span-8">
+                <div class="text-sm font-semibold mb-6 flex flex-wrap items-center gap-2 text-gray-300">
+                    <a href="#" class="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded">Home</a>
+                    <span>›</span>
+                    <a href="#" class="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded text-center">IT & Computer Science</a>
+                    <span>›</span>
+                    <span class="text-gray-400">Artificial Intelligence</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight sm:leading-tight lg:leading-tight mb-6 tracking-tight text-balance">
+                    AI Power User
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-200 mb-8 max-w-3xl leading-relaxed text-pretty">
+                    Master foundational Artificial Intelligence tools to automate complex tasks, boost your productivity, and reclaim hours of your work week. No prior coding experience required.
+                </p>
+                
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6 mb-10">
+                    <div class="flex items-center gap-2">
+                        <div class="flex text-yellow-400 text-lg">
+                            ★★★★★
+                        </div>
+                        <span class="text-sm font-medium border-b border-white/50 border-dashed cursor-pointer hover:border-solid hover:border-white transition-all" data-modal-target="reviews">4.9 stars (1,240 reviews)</span>
+                    </div>
+                    <div class="hidden sm:block w-1 h-1 bg-gray-500 rounded-full"></div>
+                    <div class="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        18,450 enrolled
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 gap-y-8 border-t border-gray-700 pt-8 mt-8">
+                    <div>
+                        <div class="text-gray-400 text-xs uppercase tracking-wider font-semibold mb-1">Duration</div>
+                        <div class="font-bold text-base sm:text-lg flex items-center gap-2">1–2 weeks</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-xs uppercase tracking-wider font-semibold mb-1">Weekly Study</div>
+                        <div class="font-bold text-base sm:text-lg">5-7 hours</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-xs uppercase tracking-wider font-semibold mb-1">Learning</div>
+                        <div class="font-bold text-base sm:text-lg">100% online</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-xs uppercase tracking-wider font-semibold mb-1">Level</div>
+                        <div class="font-bold text-base sm:text-lg">Introductory</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bg-white border-b border-fl-gray-border sticky top-16 z-40 shadow-sm hidden md:block">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex gap-6 lg:gap-8 font-semibold text-sm">
+                <a href="#overview" class="py-4 border-b-4 border-fl-pink text-fl-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink rounded-t">Overview</a>
+                <a href="#curriculum" class="py-4 border-b-4 border-transparent text-fl-text-light hover:text-fl-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink rounded-t">Curriculum</a>
+                <a href="#reviews" class="py-4 border-b-4 border-transparent text-fl-text-light hover:text-fl-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink rounded-t">Reviews</a>
+                <a href="#faq" class="py-4 border-b-4 border-transparent text-fl-text-light hover:text-fl-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink rounded-t">FAQs</a>
+            </nav>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-y-12 lg:gap-x-12">
+        
+        <div class="lg:col-span-8 space-y-12 sm:space-y-16">
+            
+            <section id="overview" class="scroll-mt-32">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Course Overview</h2>
+                <div class="prose max-w-none text-base sm:text-lg text-fl-text-light leading-relaxed space-y-4 sm:space-y-6">
+                    <p>Unlock the power of Artificial Intelligence to transform your daily operations. This course takes you from a curious beginner to a confident practitioner of modern AI workflows, enabling you to increase output quality and streamline repetitive tasks.</p>
+                    <p>Understanding how to leverage large language models (LLMs) and automated agent loops is rapidly becoming a mandatory digital skill. In this course, you will move beyond basic chat prompts and learn how to integrate AI directly into your existing tools and processes.</p>
+                </div>
+            </section>
+
+            <section id="skills" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Skills you will gain</h2>
+                <div class="flex flex-wrap gap-2 sm:gap-3">
+                    <span class="inline-flex bg-white border border-fl-gray-border rounded-md px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-fl-text shadow-sm">Prompt Engineering</span>
+                    <span class="inline-flex bg-white border border-fl-gray-border rounded-md px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-fl-text shadow-sm">Workflow Automation</span>
+                    <span class="inline-flex bg-white border border-fl-gray-border rounded-md px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-fl-text shadow-sm">Process Mapping</span>
+                    <span class="inline-flex bg-white border border-fl-gray-border rounded-md px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-fl-text shadow-sm">AI Tool Evaluation</span>
+                    <span class="inline-flex bg-white border border-fl-gray-border rounded-md px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-fl-text shadow-sm">API Integrations (No-Code)</span>
+                </div>
+            </section>
+
+            <section id="outcomes" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">What you will achieve</h2>
+                <p class="mb-6 text-fl-text-light text-base sm:text-lg">By the end of the course, you'll be able to...</p>
+                <ul class="space-y-4 sm:space-y-5">
+                    <li class="flex gap-3 sm:gap-4 items-start">
+                        <svg class="w-6 h-6 text-fl-pink shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-base sm:text-lg text-fl-text-light leading-relaxed"><strong class="text-fl-dark font-semibold">Identify</strong> the core components of an efficient AI workflow and apply them to your specific industry.</span>
+                    </li>
+                    <li class="flex gap-3 sm:gap-4 items-start">
+                        <svg class="w-6 h-6 text-fl-pink shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-base sm:text-lg text-fl-text-light leading-relaxed"><strong class="text-fl-dark font-semibold">Design</strong> automated systems using modern LLMs to handle repetitive administrative and creative tasks.</span>
+                    </li>
+                    <li class="flex gap-3 sm:gap-4 items-start">
+                        <svg class="w-6 h-6 text-fl-pink shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-base sm:text-lg text-fl-text-light leading-relaxed"><strong class="text-fl-dark font-semibold">Evaluate</strong> different AI tools (ChatGPT, Claude, Midjourney) to select the right solution for specific business use cases.</span>
+                    </li>
+                    <li class="flex gap-3 sm:gap-4 items-start">
+                        <svg class="w-6 h-6 text-fl-pink shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-base sm:text-lg text-fl-text-light leading-relaxed"><strong class="text-fl-dark font-semibold">Deploy</strong> custom, self-operating AI agents using no-code platforms to scale your individual output.</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="learning-experience" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">How you will learn</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 bg-fl-gray-light p-5 sm:p-8 rounded-xl border border-fl-gray-border">
+                    <div class="flex gap-3 sm:gap-4 items-start">
+                        <div class="bg-white p-2.5 sm:p-3 rounded-full shadow-sm text-fl-pink shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base sm:text-lg mb-1 sm:mb-2">AI Tool Masterclasses</h3>
+                            <p class="text-fl-text-light text-sm leading-relaxed">Master industry-leading AI tools through practical demonstrations and real use cases.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 sm:gap-4 items-start">
+                        <div class="bg-white p-2.5 sm:p-3 rounded-full shadow-sm text-fl-pink shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base sm:text-lg mb-1 sm:mb-2">Build Real Workflows</h3>
+                            <p class="text-fl-text-light text-sm leading-relaxed">Create automated systems, content pipelines, and productivity workflows from scratch.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 sm:gap-4 items-start">
+                        <div class="bg-white p-2.5 sm:p-3 rounded-full shadow-sm text-fl-pink shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base sm:text-lg mb-1 sm:mb-2">Implementation Challenges</h3>
+                            <p class="text-fl-text-light text-sm leading-relaxed">Practice with hands-on exercises designed around real business and workplace scenarios.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 sm:gap-4 items-start">
+                        <div class="bg-white p-2.5 sm:p-3 rounded-full shadow-sm text-fl-pink shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base sm:text-lg mb-1 sm:mb-2">Certification Project</h3>
+                            <p class="text-fl-text-light text-sm leading-relaxed">Complete a practical AI project to demonstrate your ability to apply AI effectively.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="curriculum" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4">Course Curriculum</h2>
+                <p class="text-fl-text-light text-base sm:text-lg mb-6 sm:mb-8 text-pretty">This course is designed to be completed in 1–2 weeks. Each module builds sequentially, taking you from basic AI communication to advanced workplace automation.</p>
+                
+                <div class="space-y-4">
+                    <details class="group border border-fl-gray-border rounded-lg bg-white overflow-hidden" open>
+                        <summary class="flex justify-between items-center font-bold text-lg sm:text-xl p-4 sm:p-6 bg-fl-gray-light hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fl-pink">
+                            <div class="flex flex-col sm:flex-row sm:gap-6 sm:items-center gap-1">
+                                <span class="text-fl-pink text-xs sm:text-sm uppercase tracking-wider font-semibold">Module 1</span>
+                                <span class="leading-tight">Foundations of AI Tools</span>
+                            </div>
+                            <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </summary>
+                        <div class="p-4 sm:p-6 border-t border-fl-gray-border text-fl-text-light space-y-4">
+                            <p class="leading-relaxed text-sm sm:text-base">We begin by demystifying the current landscape of AI. You will set up your primary toolkit and learn how to communicate effectively with large language models to generate high-quality outputs.</p>
+                            <ul class="list-disc pl-5 space-y-2 mt-4 text-fl-dark font-medium text-sm sm:text-base">
+                                <li>Introduction to Modern LLMs (ChatGPT vs Claude)</li>
+                                <li>Advanced Prompt Engineering Frameworks</li>
+                                <li><strong>Project:</strong> Crafting and refining your first complex prompt sequence</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="group border border-fl-gray-border rounded-lg bg-white overflow-hidden">
+                        <summary class="flex justify-between items-center font-bold text-lg sm:text-xl p-4 sm:p-6 bg-fl-gray-light hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fl-pink">
+                            <div class="flex flex-col sm:flex-row sm:gap-6 sm:items-center gap-1">
+                                <span class="text-fl-pink text-xs sm:text-sm uppercase tracking-wider font-semibold">Module 2</span>
+                                <span class="leading-tight">Automating Daily Tasks</span>
+                            </div>
+                            <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </summary>
+                        <div class="p-4 sm:p-6 border-t border-fl-gray-border text-fl-text-light space-y-4">
+                            <p class="leading-relaxed text-sm sm:text-base">Move beyond simple chat interfaces. Learn to connect AI to your existing software stack using low-code platforms to automate repetitive administrative and data-entry work.</p>
+                            <ul class="list-disc pl-5 space-y-2 mt-4 text-fl-dark font-medium text-sm sm:text-base">
+                                <li>Connecting AI via Zapier and Make</li>
+                                <li>Automating data processing and synthesis</li>
+                                <li><strong>Project:</strong> Building an automated email triage and responder system</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="group border border-fl-gray-border rounded-lg bg-white overflow-hidden">
+                        <summary class="flex justify-between items-center font-bold text-lg sm:text-xl p-4 sm:p-6 bg-fl-gray-light hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fl-pink">
+                            <div class="flex flex-col sm:flex-row sm:gap-6 sm:items-center gap-1">
+                                <span class="text-fl-pink text-xs sm:text-sm uppercase tracking-wider font-semibold">Module 3</span>
+                                <span class="leading-tight">Advanced AI Workflows</span>
+                            </div>
+                            <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </summary>
+                        <div class="p-4 sm:p-6 border-t border-fl-gray-border text-fl-text-light space-y-4">
+                            <p class="leading-relaxed text-sm sm:text-base">In the final module, you will learn how to build custom agents and deploy them for specialized tasks within your organization, cementing your role as an AI leader.</p>
+                            <ul class="list-disc pl-5 space-y-2 mt-4 text-fl-dark font-medium text-sm sm:text-base">
+                                <li>Creating Custom GPTs and secure knowledge bases</li>
+                                <li>Understanding fundamental API Integrations</li>
+                                <li><strong>Project:</strong> Deploying your first specialized AI research agent</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <section id="instructor" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8">Who will you learn with?</h2>
+                <div class="flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-fl-gray-border rounded-full shrink-0 flex items-center justify-center text-fl-text-light font-bold overflow-hidden shadow-sm">
+                        <img src="https://ui-avatars.com/api/?name=Prithvi+Bhushan&background=f5f5f5&color=de00a5&size=128" alt="Instructor Avatar" class="w-full h-full object-cover" loading="lazy" width="96" height="96">
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg sm:text-xl text-fl-pink">Prithvi Bhushan</h3>
+                        <p class="font-semibold text-fl-dark mb-3 sm:mb-4 text-sm sm:text-base">Chief Operating Officer at CBK Innovative Minds</p>
+                        <p class="text-fl-text-light leading-relaxed text-sm sm:text-base text-pretty">This program is built for people who want to use AI in real work—not just learn concepts. You'll learn practical AI tools, automation workflows, productivity systems, and real-world applications that help you save time, work smarter, and create more value in your career or business. Every lesson focuses on implementation, not theory.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 p-5 sm:p-6 bg-fl-gray-light rounded-lg border border-fl-gray-border flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+                    <div class="font-bold text-xl sm:text-2xl tracking-tighter text-fl-dark shrink-0">AI.Learn</div>
+                    <p class="text-sm text-fl-text-light md:border-l md:border-fl-gray-border md:pl-6 leading-relaxed">Where practical AI skills meet real-world execution. Every module is built around modern AI tools, automation systems, and hands-on implementation rather than traditional theory-based learning.</p>
+                </div>
+            </section>
+
+            <section id="reviews" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 sm:mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-2">Learner reviews</h2>
+                        <div class="flex items-center gap-2">
+                            <div class="flex text-yellow-400 text-base sm:text-lg">★★★★★</div>
+                            <span class="font-bold text-base sm:text-lg">4.9</span>
+                            <span class="text-fl-text-light text-xs sm:text-sm">(1,240 reviews)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                    <div class="border border-fl-gray-border p-5 sm:p-6 rounded-lg shadow-sm bg-white flex flex-col h-full">
+                        <div class="flex text-yellow-400 text-sm mb-3 sm:mb-4">★★★★★</div>
+                        <h4 class="font-bold text-base sm:text-lg mb-2">Immediately applicable</h4>
+                        <p class="text-fl-text-light mb-6 leading-relaxed text-sm sm:text-base flex-grow">"This course completely transformed how I handle data analysis. Within the second week, I had automated a reporting task that used to take me 4 hours every Monday. Highly recommended for any business professional."</p>
+                        <div class="text-xs sm:text-sm mt-auto">
+                            <span class="font-bold text-fl-dark">Sarah M.</span> • Marketing Director
+                        </div>
+                    </div>
+                    
+                    <div class="border border-fl-gray-border p-5 sm:p-6 rounded-lg shadow-sm bg-white flex flex-col h-full">
+                        <div class="flex text-yellow-400 text-sm mb-3 sm:mb-4">★★★★★</div>
+                        <h4 class="font-bold text-base sm:text-lg mb-2">Perfect for beginners</h4>
+                        <p class="text-fl-text-light mb-6 leading-relaxed text-sm sm:text-base flex-grow">"I had zero coding experience and was quite intimidated by AI. David breaks everything down so clearly. The hands-on activities with Zapier gave me the confidence to build my own workflows."</p>
+                        <div class="text-xs sm:text-sm mt-auto">
+                            <span class="font-bold text-fl-dark">James R.</span> • Freelance Designer
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="certificate" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Earn a certificate</h2>
+                <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start border border-fl-gray-border p-6 sm:p-8 rounded-xl bg-fl-gray-light">
+                    <div class="flex-1 w-full">
+                        <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Prove your new skills</h3>
+                        <p class="text-fl-text-light mb-5 sm:mb-6 leading-relaxed text-sm sm:text-base">Upgrade your course to receive a formal Certificate of Achievement. Use it to demonstrate your commitment to professional development, validate your AI literacy, and share your success directly to your LinkedIn profile.</p>
+                        <ul class="text-sm text-fl-dark font-medium space-y-3">
+                            <li class="flex gap-3 items-center"><svg class="w-5 h-5 text-fl-pink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>Official institutional branding</span></li>
+                            <li class="flex gap-3 items-center"><svg class="w-5 h-5 text-fl-pink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>Unique verification URL for employers</span></li>
+                        </ul>
+                    </div>
+                    <div class="w-48 h-36 bg-white border border-fl-gray-border shadow-md flex flex-col items-center justify-center rounded-sm relative p-4 shrink-0 mx-auto sm:mx-0">
+                        <div class="w-full border-b border-gray-200 pb-2 mb-2 text-center">
+                            <div class="font-bold text-xs tracking-tighter text-fl-dark">AI.Learn</div>
+                        </div>
+                        <span class="text-fl-pink font-bold text-[10px] uppercase tracking-widest text-center mt-2">Certificate of<br>Achievement</span>
+                        <div class="absolute bottom-2 right-2 w-6 h-6 bg-yellow-400 rounded-full opacity-30"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="faq" class="pt-8 border-t border-fl-gray-border scroll-mt-32">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group border border-fl-gray-border rounded-lg bg-white overflow-hidden">
+                        <summary class="flex justify-between items-center font-bold text-base sm:text-lg p-5 sm:p-6 hover:bg-fl-gray-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fl-pink">
+                            <span class="pr-4">Do I need to know how to code to take this course?</span>
+                            <span class="transition group-open:rotate-180 text-fl-pink shrink-0">
+                                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </summary>
+                        <div class="p-5 sm:p-6 pt-0 text-fl-text-light leading-relaxed text-sm sm:text-base">
+                            No. This course is specifically designed for non-technical professionals. We focus entirely on "low-code" and "no-code" tools, meaning you can build powerful automated workflows using visual interfaces and plain English commands.
+                        </div>
+                    </details>
+                    
+                    <details class="group border border-fl-gray-border rounded-lg bg-white overflow-hidden">
+                        <summary class="flex justify-between items-center font-bold text-base sm:text-lg p-5 sm:p-6 hover:bg-fl-gray-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fl-pink">
+                            <span class="pr-4">Will I need to pay for additional software?</span>
+                            <span class="transition group-open:rotate-180 text-fl-pink shrink-0">
+                                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </summary>
+                        <div class="p-5 sm:p-6 pt-0 text-fl-text-light leading-relaxed text-sm sm:text-base">
+                            All the foundational techniques taught in this course can be applied using the free tiers of tools like ChatGPT, Claude, and Zapier. While we do discuss premium features for context, paid subscriptions are completely optional.
+                        </div>
+                    </details>
+
+                    <details class="group border border-fl-gray-border rounded-lg bg-white overflow-hidden">
+                        <summary class="flex justify-between items-center font-bold text-base sm:text-lg p-5 sm:p-6 hover:bg-fl-gray-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fl-pink">
+                            <span class="pr-4">When does the course start?</span>
+                            <span class="transition group-open:rotate-180 text-fl-pink shrink-0">
+                                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+                        </summary>
+                        <div class="p-5 sm:p-6 pt-0 text-fl-text-light leading-relaxed text-sm sm:text-base">
+                            Right away. The course is 100% online and entirely self-paced. As soon as you complete your free registration, you can begin learning immediately.
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="lg:col-span-4 relative mt-8 lg:mt-0">
+            <div class="lg:sticky lg:top-24 bg-white rounded-xl shadow-card border border-fl-gray-border overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    <h3 class="text-xl sm:text-2xl font-bold mb-2">Start learning today</h3>
+                    <p class="text-fl-text-light text-sm">Join 18,450 professionals upgrading their skills.</p>
+                </div>
+                
+                <div class="bg-fl-gray-light p-6 sm:p-8 border-t border-fl-gray-border">
+                    <h4 class="font-bold text-base sm:text-lg mb-1">Upgrade to Premium — ₹99 ($1)</h4>
+                    <p class="text-xs sm:text-sm text-fl-text-light mb-5 font-medium">One-Time Payment • Lifetime Access</p>
+                    <ul class="text-sm text-fl-text-light space-y-3 sm:space-y-4 mb-6">
+                        <li class="flex gap-3 items-start">
+                            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span><strong class="text-fl-dark">Lifetime Access</strong> to All Course Content</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span><strong class="text-fl-dark">Verified Certificate</strong> of Completion</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span><strong class="text-fl-dark">Downloadable</strong> Learning Resources</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span><strong class="text-fl-dark">Share Credentials</strong> on LinkedIn & X</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span><strong class="text-fl-dark">Learn at Your Own Pace</strong> Forever</span>
+                        </li>
+                    </ul>
+                    <button onclick="handleGetCertified()" class="w-full bg-white border-2 border-fl-pink text-fl-pink hover:bg-fl-pink hover:text-white font-bold py-2.5 sm:py-3 px-6 rounded transition-colors mb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-fl-pink active:scale-[0.98]">
+                        Get Certified
+                    </button>
+                    <p class="text-center text-xs text-fl-text-light">14-Day Money-Back Guarantee</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-fl-dark text-white pt-12 sm:pt-16 pb-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 sm:mb-12 border-b border-gray-700 pb-10 sm:pb-12">
+            <div>
+                <h4 class="font-bold mb-4 sm:mb-6 text-sm sm:text-base">Subjects</h4>
+                <ul class="space-y-3 sm:space-y-4 text-sm text-gray-400">
+                    <li><a href="#" data-modal-target="subjects" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Business & Management</a></li>
+                    <li><a href="#" data-modal-target="subjects" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">IT & Computer Science</a></li>
+                    <li><a href="#" data-modal-target="subjects" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Design & Arts</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 sm:mb-6 text-sm sm:text-base">Courses</h4>
+                <ul class="space-y-3 sm:space-y-4 text-sm text-gray-400">
+                    <li><a href="#" data-modal-target="courses" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Short courses</a></li>
+                    <li><a href="#" data-modal-target="courses" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">ExpertTracks</a></li>
+                    <li><a href="#" data-modal-target="courses" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Online Degrees</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 sm:mb-6 text-sm sm:text-base">About</h4>
+                <ul class="space-y-3 sm:space-y-4 text-sm text-gray-400">
+                    <li><a href="#" data-modal-target="about" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">About AI.Learn</a></li>
+                    <li><a href="#" data-modal-target="careers" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Careers</a></li>
+                    <li><a href="#" data-modal-target="press" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Press</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 sm:mb-6 text-sm sm:text-base">Help</h4>
+                <ul class="space-y-3 sm:space-y-4 text-sm text-gray-400">
+                    <li><a href="#" data-modal-target="faq" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">FAQs</a></li>
+                    <li><a href="#" data-modal-target="contact" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1 -ml-1">Contact us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs sm:text-sm text-gray-400 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <p>&copy; 2026 AI.Learn. All rights reserved.</p>
+            <div class="flex flex-wrap justify-center gap-4 sm:gap-6">
+                <a href="#" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1">Terms</a>
+                <a href="#" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1">Privacy</a>
+                <a href="#" class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded px-1">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="auth-overlay" class="auth-overlay" aria-hidden="true" role="dialog">
+        <div class="shell">
+            <button type="button" onclick="closeAuthModal()" class="auth-close-btn" aria-label="Close modal">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+            <section class="hero">
+                <video autoplay muted loop playsinline aria-hidden="true">
+                    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260506_081238_406ed0e3-5d83-436e-a512-0bbff7ec5b95.mp4" type="video/mp4"/>
+                </video>
+                <div class="hero-scrim"></div>
+                <div class="hero-logo">AI.Learn</div>
+                <div class="hero-body">
+                    <h1 class="h1">Learn.<br/>Certify.<br/><em>Innovate.</em></h1>
+                </div>
+            </section>
+            
+            <section class="form-col">
+                <div class="form-box">
+                    <h2 class="form-title" id="form-title">Start Your<br/>Learning Journey</h2>
+                    <p class="form-sub" id="form-sub">Enter your details to unlock courses, certifications &amp; skill-up programs.</p>
+
+                    <div class="socials">
+                        <button class="soc-btn" type="button" id="google-signin-btn" aria-label="Sign in with Google">
+                            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                            Continue with Google
+                        </button>
+                    </div>
+
+                    <div class="div-row">
+                        <div class="div-line"></div>
+                        <span class="div-txt" id="div-txt">Or sign up with email</span>
+                        <div class="div-line"></div>
+                    </div>
+
+                    <form id="auth-form" novalidate>
+                        <div class="fields-wrap">
+                            <div class="f-grid" id="name-fields">
+                                <div class="f-grp" style="margin-bottom:0">
+                                    <label for="fn">First Name</label>
+                                    <input type="text" id="fn" placeholder="Enter first name" autocomplete="given-name" required/>
+                                </div>
+                                <div class="f-grp" style="margin-bottom:0">
+                                    <label for="ln">Last Name</label>
+                                    <input type="text" id="ln" placeholder="Enter last name" autocomplete="family-name" required/>
+                                </div>
+                            </div>
+
+                            <div class="f-grp" style="margin-top:10px">
+                                <label for="em">Email Address</label>
+                                <input type="email" id="em" placeholder="name@example.com" autocomplete="email" required/>
+                            </div>
+
+                            <div class="f-grp">
+                                <label for="pw">Password</label>
+                                <div class="iw">
+                                    <input type="password" id="pw" class="pwd-i" placeholder="Create a strong password" autocomplete="new-password" required/>
+                                    <button type="button" class="eye" id="eye-btn" aria-label="Toggle password visibility">
+                                        <svg id="eye-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="hint">Minimum 8 characters required.</p>
+                                <div id="forgot-pw-row" style="display:none; justify-content:flex-end; margin-top:6px;">
+                                    <button type="button" id="forgot-pw-btn" style="font-size:12px;font-weight:600;color:#C6FF00;background:none;border:none;cursor:pointer;padding:0;">Forgot Password?</button>
+                                </div>
+                            </div>
+
+                            <div class="f-grp" id="interest-field">
+                                <label for="cr">Area of Interest</label>
+                                <select id="cr" required aria-label="Select learning path">
+                                    <option value="" disabled selected>Select a learning path</option>
+                                    <option value="tech">Technology &amp; Software</option>
+                                    <option value="data">Data Science &amp; AI</option>
+                                    <option value="design">UI/UX &amp; Design</option>
+                                    <option value="biz">Business &amp; Management</option>
+                                    <option value="mkt">Digital Marketing</option>
+                                    <option value="fin">Finance &amp; Accounting</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="sub-btn" id="submit-btn">Create My Account →</button>
+                    </form>
+
+                    <p class="foot"><span id="footer-text-pre">Already a member? </span><a id="toggle-auth">Log in to CI Minds</a></p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="navigation-modal-hub" class="fixed inset-0 z-[100] bg-fl-dark/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 md:p-10 modal-overlay modal-hidden" aria-hidden="true" role="dialog">
+        <div class="bg-white w-full max-w-5xl h-full max-h-[85vh] rounded-xl shadow-2xl overflow-hidden flex flex-col modal-content-container" onclick="event.stopPropagation()">
+            <div class="px-6 py-4 border-b border-fl-gray-border flex items-center justify-between shrink-0 bg-fl-gray-light">
+                <div class="flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 bg-fl-pink rounded-full"></span>
+                    <h2 id="modal-workspace-title" class="text-lg font-bold uppercase tracking-wider text-fl-dark">Workspace</h2>
+                </div>
+                <button type="button" onclick="closeNavigationHub()" class="p-2 text-fl-text-light hover:text-fl-pink transition-colors focus:outline-none rounded-md border border-transparent hover:border-fl-gray-border bg-white shadow-sm" aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            </div>
+    </div>
+
+    <script>
+        // --- Structural State Engine Configuration ---
+        const UI_STATE = {
+            activeModalPane: null,
+            userSession: null
+        };
+
+        // ── Stubs overridden by the ESM module below ──────────────────────────
+        // These placeholders prevent "not defined" errors during initial parse
+        function triggerGoogleLogin() { if(window._signInWithGoogle) window._signInWithGoogle().catch(()=>{}); }
+        function triggerLogout() { if(window._firebaseSignOut) window._firebaseSignOut().then(() => { UI_STATE.userSession = null; renderLoggedOutHeaderState(); }); }
+
+        // ── Get Certified button — go to dashboard if logged in, else sign-up modal ──
+        function handleGetCertified() {
+            if (UI_STATE.userSession) {
+                window.location.href = 'dashboard.html';
+            } else {
+                openAuthModal(false); // false = sign-up flow
+            }
+        }
+
+        // ── Render logged-OUT header state ─────────────────────────────────────
+        function renderLoggedOutHeaderState() {
+            const zones = document.getElementById('auth-header-zone');
+            if (!zones) return;
+            zones.innerHTML = `
+                <button type="button" onclick="openAuthModal(true)" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded text-fl-dark hover:text-fl-pink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink">Sign In</button>
+                <button type="button" onclick="openAuthModal(false)" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-fl-pink text-white rounded font-bold hover:bg-fl-pink-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fl-pink active:scale-[0.97]">Sign Up</button>
+                <button type="button" onclick="toggleLandingMobileMenu()" class="md:hidden p-2 text-fl-dark hover:text-fl-pink transition-colors focus:outline-none rounded-md" aria-label="Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            `;
+            const mobileZone = document.getElementById('mobile-auth-zone');
+            if (mobileZone) {
+                mobileZone.innerHTML = `
+                    <button type="button" onclick="openAuthModal(true); toggleLandingMobileMenu();" class="w-full text-left text-sm font-semibold text-fl-dark py-2">Sign In</button>
+                    <button type="button" onclick="openAuthModal(false); toggleLandingMobileMenu();" class="w-full bg-fl-pink text-white text-sm font-bold py-2 rounded text-center">Sign Up</button>
+                `;
+            }
+        }
+
+
+        function renderIdentityHeaderState() {
+            if (!UI_STATE.userSession) return;
+            const targetArea = document.getElementById('auth-header-zone');
+            
+            // [ADDED] Desktop dropdown structure matches previous state but points correctly to learning portal
+            targetArea.innerHTML = `
+                <div class="relative inline-block text-left group">
+                    <button type="button" class="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-fl-pink rounded-full p-0.5" id="profile-dropdown-trigger" aria-haspopup="true" aria-expanded="true">
+                        <img src="${UI_STATE.userSession.avatar}" alt="User Avatar" class="w-8 h-8 rounded-full object-cover border border-fl-gray-border">
+                        <span class="hidden lg:inline text-sm font-semibold text-fl-dark max-w-[120px] truncate">${UI_STATE.userSession.name}</span>
+                        <svg class="w-4 h-4 text-fl-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-fl-gray-border focus:outline-none hidden group-focus-within:block group-hover:block z-50">
+                        <div class="px-4 py-3">
+                            <p class="text-xs text-fl-text-light font-medium">Authenticated profile</p>
+                            <p class="text-sm font-bold text-fl-dark truncate mt-0.5">${UI_STATE.userSession.name}</p>
+                        </div>
+                        <div class="py-1">
+                            <a href="dashboard.html" class="text-fl-text block px-4 py-2 text-sm hover:bg-fl-gray-light font-bold transition-colors">Go to Dashboard</a>
+                        </div>
+                        <div class="py-1">
+                            <button type="button" onclick="triggerLogout()" class="text-fl-pink w-full text-left block px-4 py-2 text-sm hover:bg-fl-gray-light font-semibold transition-colors">Sign out session</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleLandingMobileMenu()" class="md:hidden p-2 text-fl-dark hover:text-fl-pink transition-colors focus:outline-none rounded-md" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            `;
+
+            // [ADDED] Task 1: Reflect logged-in state strictly onto the Mobile hamburger menu panel
+            const mobileZone = document.getElementById('mobile-auth-zone');
+            if (mobileZone) {
+                mobileZone.innerHTML = `
+                    <div class="flex items-center gap-3 mb-2">
+                        <img src="${UI_STATE.userSession.avatar}" class="w-10 h-10 rounded-full border border-fl-gray-border object-cover">
+                        <div>
+                            <div class="text-sm font-bold text-fl-dark">${UI_STATE.userSession.name}</div>
+                            <div class="text-xs text-fl-text-light">${UI_STATE.userSession.email}</div>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='dashboard.html'" class="w-full bg-fl-pink hover:bg-fl-pink-hover text-white text-sm font-bold py-2.5 rounded text-center transition-colors shadow-sm">Go to Learning Portal</button>
+                    <button onclick="triggerLogout()" class="w-full text-left text-fl-pink text-sm font-bold py-2">Sign Out</button>
+                `;
+            }
+        }
+
+        // --- [ADDED] Task 1 & 7: Simple mobile navigation toggle ---
+        function toggleLandingMobileMenu() {
+            const menu = document.getElementById('landing-mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        }
+
+        // --- Auth Overlay & State Controllers ---
+        window.isLogin = false;  // global so ESM module can read it
+        const authToggleBtn = document.getElementById('toggle-auth');
+        const formTitle = document.getElementById('form-title');
+        const formSub = document.getElementById('form-sub');
+        const divTxt = document.getElementById('div-txt');
+        const nameFields = document.getElementById('name-fields');
+        const interestField = document.getElementById('interest-field');
+        const submitBtn = document.getElementById('submit-btn');
+        const footerTextPre = document.getElementById('footer-text-pre');
+        
+        const fnInput = document.getElementById('fn');
+        const lnInput = document.getElementById('ln');
+        const crInput = document.getElementById('cr');
+
+        function openAuthModal(loginFlowRequested) {
+            const overlay = document.getElementById('auth-overlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            if (window.isLogin !== loginFlowRequested) {
+                window.isLogin = !loginFlowRequested;
+                authToggleBtn.click();
+            }
+        }
+
+        function closeAuthModal() {
+            const overlay = document.getElementById('auth-overlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        window.closeAuthModal = closeAuthModal;
+
+        authToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.isLogin = !window.isLogin;
+
+            const isMobile = window.innerWidth < 768;
+            if (window.isLogin) {
+                formTitle.innerHTML = isMobile ? 'Log in to CI MINDS' : 'Welcome Back<br/>to CI Minds';
+                formSub.textContent = isMobile ? '' : 'Enter your credentials to access your learning dashboard.';
+                divTxt.textContent = 'Or log in with email';
+                nameFields.style.display = 'none';
+                interestField.style.display = 'none';
+                submitBtn.textContent = isMobile ? 'Login' : 'Log in to Account →';
+                footerTextPre.textContent = "Don't have an account? ";
+                authToggleBtn.textContent = 'Sign Up';
+                
+                fnInput.required = false;
+                lnInput.required = false;
+                crInput.required = false;
+                // Show forgot password only on mobile in login mode
+                const fpr = document.getElementById('forgot-pw-row');
+                if (fpr) fpr.style.display = (window.innerWidth < 768) ? 'flex' : 'none';
+            } else {
+                formTitle.innerHTML = isMobile ? 'Get your free account' : 'Start Your<br/>Learning Journey';
+                formSub.textContent = isMobile ? '' : 'Enter your details to unlock courses, certifications & skill-up programs.';
+                divTxt.textContent = 'Or sign up with email';
+                nameFields.style.display = isMobile ? 'flex' : 'grid';
+                if (isMobile) { nameFields.style.flexDirection = 'column'; nameFields.style.gap = '0'; }
+                interestField.style.display = 'flex'; 
+                submitBtn.textContent = isMobile ? 'Continue with Email' : 'Create My Account →';
+                footerTextPre.textContent = 'Already have an account? ';
+                authToggleBtn.textContent = 'Login';
+                
+                fnInput.required = true;
+                lnInput.required = true;
+                crInput.required = true;
+                const fpr = document.getElementById('forgot-pw-row');
+                if (fpr) fpr.style.display = 'none';
+            }
+        });
+
+        const pw = document.getElementById('pw');
+        const eb = document.getElementById('eye-btn');
+        const ei = document.getElementById('eye-ico');
+        const onIcon = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        const offIcon = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+        
+        eb.addEventListener('click', () => {
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+            ei.innerHTML = pw.type === 'text' ? offIcon : onIcon;
+            pw.focus();
+        });
+
+        // Forgot password button (mobile)
+        const forgotBtn = document.getElementById('forgot-pw-btn');
+        if (forgotBtn) {
+            forgotBtn.addEventListener('click', () => {
+                const emailVal = document.getElementById('em').value.trim();
+                if (window._sendPasswordReset) {
+                    window._sendPasswordReset(emailVal);
+                }
+            });
+        }
+
+    </script>
+
+    <!-- ── Firebase Auth (ESM module — runs after DOM) ──────────────────────── -->
+    <script type="module">
+        import {
+            onAuthChange, signInWithGoogle, signInEmail, signUpEmail,
+            updateDisplayName, firebaseSignOut, saveUserProfile, getFriendlyError,
+            sendPasswordReset
+        } from './firebase-config.js';
+
+        // ── Expose helpers to global scope so inline onclick handlers can reach them
+        window._firebaseSignOut      = firebaseSignOut;
+        window._signInWithGoogle     = signInWithGoogle;
+        window._getFriendlyError     = getFriendlyError;
+        window._sendPasswordReset    = async (email) => {
+            const emailField = document.getElementById('em');
+            if (!email) {
+                emailField.focus();
+                showAuthError('Enter your email address first, then tap Forgot Password.');
+                return;
+            }
+            try {
+                await sendPasswordReset(email);
+                showAuthError(''); // clear errors
+                // Show success inline
+                let el = document.getElementById('auth-error-banner');
+                if (!el) { el = document.createElement('p'); el.id = 'auth-error-banner'; document.getElementById('auth-form').after(el); }
+                el.style.cssText = 'color:#C6FF00;font-size:12px;text-align:center;margin-top:10px;padding:8px 12px;background:rgba(198,255,0,0.08);border-radius:8px;border:1px solid rgba(198,255,0,0.2)';
+                el.textContent = '✓ Reset link sent! Check your inbox.';
+                el.style.display = 'block';
+            } catch(err) {
+                showAuthError(getFriendlyError(err.code));
+            }
+        };
+
+        // ── Helper: show/hide auth error banner ────────────────────────────────
+        function showAuthError(msg) {
+            if (!msg) return;
+            let el = document.getElementById('auth-error-banner');
+            if (!el) {
+                el = document.createElement('p');
+                el.id = 'auth-error-banner';
+                el.style.cssText = 'color:#f87171;font-size:12px;text-align:center;margin-top:10px;padding:8px 12px;background:rgba(239,68,68,0.1);border-radius:8px;border:1px solid rgba(239,68,68,0.25)';
+                const form = document.getElementById('auth-form');
+                if (form) form.after(el);
+            }
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function clearAuthError() {
+            const el = document.getElementById('auth-error-banner');
+            if (el) el.style.display = 'none';
+        }
+        window._clearAuthError = clearAuthError;
+
+        // ── Auth state observer ────────────────────────────────────────────────
+        onAuthChange((user) => {
+            if (user) {
+                const avatarUrl = user.photoURL ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=201026&color=de00a5&size=96`;
+                UI_STATE.userSession = {
+                    uid:    user.uid,
+                    name:   user.displayName || user.email.split('@')[0],
+                    email:  user.email,
+                    avatar: avatarUrl
+                };
+                renderIdentityHeaderState();
+                if (window.closeAuthModal) window.closeAuthModal();
+            } else {
+                UI_STATE.userSession = null;
+                renderLoggedOutHeaderState();
+            }
+        });
+
+        // ── Google sign-in ─────────────────────────────────────────────────────
+        async function handleGoogleSignIn() {
+            clearAuthError();
+            try {
+                await signInWithGoogle();
+                // onAuthChange fires → closes modal + updates header
+                // User stays on landing page until they click "Get Certified"
+            } catch (err) {
+                const msg = getFriendlyError(err.code);
+                if (msg) showAuthError(msg);
+            }
+        }
+
+        // Wire Google button
+        const gBtn = document.getElementById('google-signin-btn');
+        if (gBtn) gBtn.addEventListener('click', e => { e.preventDefault(); handleGoogleSignIn(); });
+
+        // ── Email form submit ──────────────────────────────────────────────────
+        const authForm = document.getElementById('auth-form');
+        if (authForm) {
+            authForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                clearAuthError();
+                const b   = document.getElementById('submit-btn');
+                const em  = document.getElementById('em').value.trim();
+                const pw  = document.getElementById('pw').value;
+                const fn  = (document.getElementById('fn')?.value || '').trim();
+                const ln  = (document.getElementById('ln')?.value || '').trim();
+                const cr  = document.getElementById('cr')?.value || '';
+
+                b.textContent = window.isLogin ? 'Signing in…' : 'Creating account…';
+                b.disabled = true;
+                b.style.opacity = '.75';
+
+                try {
+                    if (window.isLogin) {
+                        await signInEmail(em, pw);
+                    } else {
+                        const cred = await signUpEmail(em, pw);
+                        const displayName = (fn + ' ' + ln).trim() || em.split('@')[0];
+                        await updateDisplayName(cred.user, displayName);
+                        await saveUserProfile(cred.user.uid, {
+                            firstName: fn, lastName: ln,
+                            email: em, interest: cr,
+                            enrolledAt: new Date().toISOString()
+                        });
+                    }
+                    b.textContent = window.isLogin ? '✓ Welcome back!' : '✓ Account created!';
+                    b.style.background = '#22c55e';
+                    b.style.color = '#fff';
+                    // Close modal after short success flash — no redirect yet
+                    setTimeout(() => { if (window.closeAuthModal) window.closeAuthModal(); }, 1000);
+                } catch (err) {
+                    // Log full error so DevTools shows the real cause
+                    console.error('[CI Minds] Auth error:', err.code, err.message, err);
+                    const mob = window.innerWidth < 768;
+                    b.textContent = window.isLogin ? (mob ? 'Login' : 'Log in to Account →') : (mob ? 'Continue with Email' : 'Create My Account →');
+                    b.disabled = false;
+                    b.style.opacity = '1';
+                    b.style.background = '';
+                    b.style.color = '';
+                    showAuthError(getFriendlyError(err.code));
+                }
+            });
+        }
+
+        // ── Patch triggerGoogleLogin + triggerLogout for global onclick calls ──
+        window.triggerGoogleLogin = handleGoogleSignIn;
+        window.triggerLogout = async () => {
+            await firebaseSignOut();
+            UI_STATE.userSession = null;
+            renderLoggedOutHeaderState();
+        };
+    </script>
+</body>
+</html>
