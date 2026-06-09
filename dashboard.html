@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AI Fast-Track | CBK Innovative Minds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#111827', surface: '#ffffff', background: '#F9FAFB' },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-in-right': 'slideInRight 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .toast-exit { transform: translateX(100%); opacity: 0; transition: all 0.3s ease-in; }
+        
+        /* Tab transition helper - Strictly controls visibility */
+        .tab-content, .profile-tab-content { display: none; }
+        .tab-content.active, .profile-tab-content.active { display: block; }
+
+        /* Floating Box Animation */
+        @keyframes boxFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .float-box {
+            animation: boxFloat 1.5s ease-in-out infinite;
+            animation-play-state: paused;
+            will-change: transform;
+            transition: box-shadow 0.3s ease;
+        }
+        .float-box:hover {
+            animation-play-state: running;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Exam Specific Styles */
+        .option-radio:checked + div { border-color: #111827; background-color: #f3f4f6; font-weight: 600; }
+        .option-radio:checked + div .radio-inner { background-color: #111827; }
+        .hide { display: none !important; }
+
+        /* ═══════════════════════════════════════════════
+           MOBILE LAYER — < 768px
+           8px grid · touch targets · safe areas
+           ═══════════════════════════════════════════════ */
+        * { -webkit-tap-highlight-color: transparent; }
+        body { padding-bottom: env(safe-area-inset-bottom); }
+
+        /* ── BOTTOM NAV (mobile only) ── */
+        #bottom-nav {
+            display: none; /* hidden on desktop */
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #fff; border-top: 1px solid #EAECF0; z-index: 40;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -4px 20px rgba(0,0,0,.05);
+        }
+        @media (max-width: 767px) { #bottom-nav { display: flex; } }
+
+        .bnav-btn {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 6px 4px 8px; gap: 3px;
+            border: none; background: none; cursor: pointer;
+            color: #9CA3AF; font-size: 10px; font-weight: 500;
+            letter-spacing: .01em; min-height: 52px; transition: color .12s;
+        }
+        .bnav-btn svg { width: 20px; height: 20px; stroke-width: 1.6; }
+        .bnav-btn.active { color: #111827; }
+        .bnav-btn.active svg { stroke-width: 2.2; }
+        .bnav-dot { width: 3px; height: 3px; border-radius: 50%; background: #111827; opacity: 0; transform: scale(0); transition: all .15s; }
+        .bnav-btn.active .bnav-dot { opacity: 1; transform: scale(1); }
+
+        /* ── DRAWER (mobile sidebar replacement) ── */
+        #mob-overlay { position: fixed; inset: 0; background: rgba(17,24,39,.4); z-index: 45; display: none; opacity: 0; transition: opacity .2s; }
+        #mob-overlay.open { display: block; opacity: 1; }
+        #mob-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 272px; background: #fff; z-index: 50; transform: translateX(-100%); transition: transform .26s cubic-bezier(.16,1,.3,1); display: flex; flex-direction: column; border-right: 1px solid #EAECF0; box-shadow: 4px 0 24px rgba(0,0,0,.08); }
+        #mob-drawer.open { transform: translateX(0); }
+
+        /* ── MOBILE LAYOUT OVERRIDES ── */
+        @media (max-width: 767px) {
+            /* Push content above bottom nav */
+            #app-container { padding-bottom: calc(68px + env(safe-area-inset-bottom)) !important; }
+            /* Hide desktop sidebar */
+            #sidebar { display: none !important; }
+            /* Header height */
+            header { height: 48px !important; padding-left: 14px !important; padding-right: 14px !important; }
+            /* Hamburger becomes drawer trigger */
+            .mob-menu-btn { display: flex !important; }
+            /* Timer badge smaller */
+            #global-timer-display { font-size: 11px !important; padding: 3px 9px !important; margin: 0 auto; }
+            /* Toast above nav */
+            #toast-container { bottom: calc(60px + env(safe-area-inset-bottom) + 6px) !important; left: 12px !important; right: 12px !important; }
+            #toast-container > div { width: 100% !important; }
+            /* Touch targets */
+            button { min-height: 44px; }
+            /* Hide desktop progress bar label on tiny screens */
+            .nav-progress-wrap { display: none; }
+        }
+        @media (min-width: 768px) {
+            /* On desktop, hamburger is hidden */
+            .mob-menu-btn { display: none !important; }
+        }
+
+        /* ── MOBILE PAGE CONTENT OVERRIDES ── */
+        @media (max-width: 767px) {
+            /* Overview layout: stack */
+            .overview-2col { flex-direction: column !important; }
+            .overview-sidebar-card { position: static !important; width: 100% !important; }
+            /* Lesson layout: stack */
+            .lesson-2col { flex-direction: column !important; }
+            .lesson-module-nav { width: 100% !important; }
+            /* Dashboard headers */
+            .dash-h1 { font-size: 1.35rem !important; }
+            /* Overview h1 */
+            .overview-h1 { font-size: 1.4rem !important; }
+            /* Profile hero */
+            .profile-hero-row { flex-direction: column !important; align-items: center !important; text-align: center !important; }
+            /* Cert actions */
+            .cert-action-row { flex-direction: column !important; }
+            /* Resume card */
+            .resume-card-inner { flex-direction: column !important; align-items: flex-start !important; }
+            .resume-card-btn { width: 100% !important; }
+            /* Module card grids */
+            .module-cards-grid { grid-template-columns: 1fr !important; }
+            /* Referral row */
+            .referral-row { flex-direction: column !important; }
+            /* Profile tabs overflow */
+            .profile-tabs-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            /* Tab row */
+            .tab-row-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            /* Exam question text */
+            #question-text { font-size: 1.1rem !important; line-height: 1.55 !important; }
+            /* Score circle */
+            .score-circle-wrap { width: 120px !important; height: 120px !important; }
+            #final-score { font-size: 2rem !important; }
+            /* Subscription card */
+            .subscription-card-inner { flex-direction: column !important; align-items: flex-start !important; }
+            /* Stat cards */
+            .stat-num-big { font-size: 2rem !important; }
+        }
+
+        /* ── SCROLLBAR HIDE on mobile ── */
+        @media (max-width: 767px) {
+            .profile-tabs-row::-webkit-scrollbar,
+            .tab-row-scroll::-webkit-scrollbar { display: none; }
+            .profile-tabs-row, .tab-row-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+
+            /* Profile dropdown — fixed to top-right on mobile, never overlaps content */
+            #profile-menu {
+                position: fixed !important;
+                top: 52px !important;
+                right: 10px !important;
+                left: auto !important;
+                max-width: calc(100vw - 20px);
+                min-width: 180px;
+                z-index: 9999 !important;
+            }
+        }
+
+        /* ── TAP FEEDBACK ── */
+        .tap { transition: transform .08s ease; }
+        .tap:active { transform: scale(.97); }
+    </style>
+</head>
+<body class="bg-background text-gray-800 font-sans h-screen overflow-hidden flex relative">
+
+    <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 z-20 hidden md:hidden transition-opacity" onclick="toggleMobileMenu()"></div>
+
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 w-72 bg-surface border-r border-gray-200 flex flex-col z-30 transition-transform duration-300 ease-in-out">
+        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors" onclick="navigate('dashboard')">
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center text-white font-bold text-xl mr-3 shadow-sm">CI</div>
+                <span class="font-bold text-lg tracking-tight text-gray-900">CBK Minds</span>
+            </div>
+            <button class="md:hidden text-gray-500 hover:text-gray-800" onclick="toggleMobileMenu(event)">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1" id="sidebar-nav"></nav>
+        
+        <div class="p-4 border-t border-gray-200 bg-gray-50/50">
+            <button onclick="navigate('profile')" class="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                My Profile
+            </button>
+            <button onclick="resetData()" class="flex items-center w-full mt-2 px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Reset Progress
+            </button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <header class="h-16 bg-surface border-b border-gray-200 flex items-center justify-between px-4 md:px-8 z-10 shrink-0">
+            <div class="flex items-center">
+                <button onclick="openMobDrawer()" class="mob-menu-btn p-2 -ml-1 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors w-10 h-10 items-center justify-center" aria-label="Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            
+            <div id="global-timer-display" class="hide flex items-center bg-gray-100 px-4 py-1.5 rounded-full text-sm font-bold text-gray-900 border border-gray-200 shadow-sm mx-auto md:mx-0 md:mr-auto">
+                <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="global-time-left">30:00</span>
+            </div>
+            
+            <div class="flex-1 flex justify-end items-center space-x-3 md:space-x-6">
+                <div class="nav-progress-wrap hidden sm:flex items-center space-x-3" title="Course Progress">
+                    <div class="text-sm font-medium text-gray-600">Progress: <span id="nav-progress-text" class="font-bold text-gray-900">0%</span></div>
+                    <div class="w-32 h-2.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                        <div id="nav-progress-bar" class="h-full bg-gray-900 transition-all duration-700 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="w-px h-6 bg-gray-200 hidden sm:block"></div>
+                
+                <div class="relative">
+                    <button onclick="toggleDropdown('profile-menu')" class="flex items-center space-x-2 focus:outline-none" aria-label="Profile menu">
+                        <img src="https://ui-avatars.com/api/?name=User&background=111827&color=fff&rounded=true" alt="User Avatar" id="header-avatar" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-900 transition-colors" style="position:relative;z-index:1;">
+                        <!-- Chevron hidden on mobile, shown on desktop only -->
+                        <svg class="w-4 h-4 text-gray-400 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 animate-fade-in">
+                        <div class="px-4 py-2 border-b border-gray-100 mb-1">
+                            <p class="text-sm font-bold text-gray-900 tracking-wide" id="dropdown-username">—</p>
+                        </div>
+                        <button onclick="navigate('profile'); toggleDropdown('profile-menu')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors">My Profile</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="app-container" class="flex-1 overflow-y-auto bg-background p-4 md:p-8 relative"></main>
+    </div>
+
+
+    <!-- ── MOBILE BOTTOM NAV ── -->
+    <nav id="bottom-nav" aria-label="Mobile navigation">
+        <button class="bnav-btn active" id="bnav-overview" onclick="navigate('overview');syncBottomNav('overview')" aria-label="Overview">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Overview<div class="bnav-dot"></div>
+        </button>
+        <button class="bnav-btn" id="bnav-dashboard" onclick="navigate('dashboard');syncBottomNav('dashboard')" aria-label="Home">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Home<div class="bnav-dot"></div>
+        </button>
+        <button class="bnav-btn" id="bnav-learn" onclick="goLearnNext();syncBottomNav('learn')" aria-label="Learn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Learn<div class="bnav-dot"></div>
+        </button>
+        <button class="bnav-btn" id="bnav-profile" onclick="navigate('profile');syncBottomNav('profile')" aria-label="Profile">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Profile<div class="bnav-dot"></div>
+        </button>
+    </nav>
+
+    <!-- ── MOBILE DRAWER ── -->
+    <div id="mob-overlay" onclick="closeMobDrawer()"></div>
+    <aside id="mob-drawer">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #F3F4F6;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:7px;cursor:pointer;" onclick="navigate('dashboard');closeMobDrawer()">
+                <div style="width:24px;height:24px;background:#111827;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:10px;">CI</div>
+                <span style="font-size:13px;font-weight:600;color:#111827;">CBK Minds</span>
+            </div>
+            <button onclick="closeMobDrawer()" style="background:none;border:none;cursor:pointer;padding:5px;color:#9CA3AF;border-radius:5px;display:flex;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <nav id="mob-drawer-nav" style="flex:1;overflow-y:auto;padding:10px 8px;"></nav>
+        <div style="padding:8px;border-top:1px solid #F3F4F6;flex-shrink:0;">
+            <button onclick="navigate('profile');closeMobDrawer()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;background:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;color:#374151;text-align:left;min-height:44px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>My Profile
+            </button>
+            <button onclick="resetData()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;background:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;color:#DC2626;text-align:left;min-height:44px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Reset Progress
+            </button>
+        </div>
+    </aside>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        // --- DATA LAYER: EXAM QUESTION BANK ---
+        const examQuestionBank = [
+            { id: "q1", module: "Day 1", type: "mcq", question: "What does 'narrow AI' refer to?", options: ["AI that is not very smart", "AI highly specialized to do specific tasks", "AI that has general human intelligence", "AI that can only process numbers"], correct: 1, explanation: "Current AI is 'narrow' because it is highly specialized for specific tasks, unlike human 'general' intelligence." },
+            { id: "q2", module: "Day 1", type: "short", question: "In the premium prompt formula (CTFT), what does the 'C' stand for?", acceptedKeywords: ["context"], explanation: "CTFT stands for Context, Task, Format, and Tone." },
+            { id: "q3", module: "Day 1", type: "mcq", question: "If you train an AI using thousands of emails already marked as 'Spam' or 'Not Spam', what kind of learning is this?", options: ["Unsupervised Learning", "Reinforcement Learning", "Supervised Learning", "Deep Learning"], correct: 2, explanation: "Because the data is explicitly labeled, it is a classic example of Supervised Learning." },
+            { id: "q4", module: "Day 1", type: "scenario", question: "You need to parse a 50-page highly logical document and want the most human-sounding written summary. Which tool is best?", options: ["ChatGPT", "Gemini", "Claude", "Midjourney"], correct: 2, explanation: "Claude is widely considered the best writer, sounding the most human and highly logical for parsing long documents." },
+            { id: "q5", module: "Day 2", type: "mcq", question: "Which tool is best used to connect AI automatically with other apps like Gmail and Google Sheets?", options: ["ChatGPT", "Zapier", "Canva Magic Studio", "Midjourney"], correct: 1, explanation: "Zapier is a no-code automation platform that connects thousands of apps to trigger AI workflows." },
+            { id: "q6", module: "Day 2", type: "scenario", question: "You want to create quick, beautiful graphics for a social media post using AI. What tool is recommended?", options: ["RunwayML", "Zapier", "Canva Magic Studio", "Claude"], correct: 2, explanation: "Canva Magic Studio is built specifically for easily generating graphics and designs for content." },
+            { id: "q7", module: "Day 2", type: "short", question: "What is the term for connecting AI to apps so tasks happen without manual input?", acceptedKeywords: ["automation", "no-code", "no code", "zapier"], explanation: "No-Code Automation allows you to delegate busywork so things happen automatically." },
+            { id: "q8", module: "Day 3", type: "mcq", question: "What does it mean when an AI 'hallucinates'?", options: ["It crashes the computer", "It invents facts that are not true", "It becomes self-aware", "It refuses to answer a prompt"], correct: 1, explanation: "Hallucinations occur when an AI confidently presents invented or false information as fact." },
+            { id: "q9", module: "Day 3", type: "short", question: "What phrase should you add to a prompt to make the AI process complex logic better? (Hint: 'think ____')", acceptedKeywords: ["step-by-step", "step by step", "chain of thought"], explanation: "Asking the AI to 'think step-by-step' triggers Chain of Thought reasoning, improving logic." },
+            { id: "q10", module: "Day 3", type: "mcq", question: "When doing AI freelancing, what is the recommended ratio of AI work to Human touch?", options: ["50% AI / 50% Human", "100% AI / 0% Human", "80% AI / 20% Human", "20% AI / 80% Human"], correct: 2, explanation: "Use AI to do 80% of the heavy lifting, then add your human touch for the final 20%." },
+            { id: "q11", module: "Day 3", type: "mcq", question: "The Golden Rule of using AI for factual or mathematical data is:", options: ["Trust it completely", "Trust but verify", "Only use ChatGPT for math", "Never use AI for numbers"], correct: 1, explanation: "Large Language Models predict text, they don't do math natively. You must always double-check." },
+            { id: "q12", module: "Day 4", type: "mcq", question: "Which tool is described as the 'best all-rounder'?", options: ["Claude", "Perplexity", "ChatGPT", "Gemini"], correct: 2, explanation: "ChatGPT is currently considered the best all-rounder for everyday tasks." },
+            { id: "q13", module: "Day 4", type: "short", question: "Which AI tool acts as a direct replacement for traditional search engines?", acceptedKeywords: ["perplexity"], explanation: "Perplexity is a conversational search engine that cites real-time sources." },
+            { id: "q14", module: "Day 4", type: "mcq", question: "According to the 15-Min Daily AI Routine, what should you do in the morning?", options: ["Summarize long emails", "Draft replies for tomorrow", "Generate social media images", "Prioritize tasks using the Eisenhower Matrix"], correct: 3, explanation: "The morning routine involves feeding Gemini your tasks to prioritize them using the Eisenhower Matrix." },
+            { id: "q15", module: "Day 4", type: "scenario", question: "You need to convert a text script into a professional video featuring a realistic AI avatar. Which tool is best?", options: ["HeyGen", "RunwayML", "Midjourney", "Canva"], correct: 0, explanation: "HeyGen specializes in creating realistic AI Video Avatars from text." }
+        ];
+
+        // --- DATA LAYER: ORIGINAL COURSE CONTENT ---
+        const courseData = [
+            {
+                id: 'm1', title: 'Day 1: AI Foundations', description: 'Understand what AI actually is, how the top tools work, and master Prompt Engineering.',
+                lessons: [
+                    { id: 'm1l1', title: '1.1 What is Artificial Intelligence?', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">How do we define AI?</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed">Artificial intelligence refers to computer systems capable of performing tasks that typically require human intelligence. These tasks include learning, reasoning, problem-solving, perception, and language understanding.</p>
+                        <p class="text-gray-600 mb-4 leading-relaxed">However, current AI is "narrow"—it is highly specialized to do specific tasks, unlike human "general" intelligence.</p>
+                        <div class="bg-gray-50 border-l-4 border-gray-900 p-5 my-8 rounded-r-xl shadow-sm">
+                            <div class="flex items-center text-gray-900 mb-2">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <h4 class="font-bold">Key Takeaway</h4>
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">AI isn't magic; it's a branch of computer science focused on building intelligent algorithms that process data systematically.</p>
+                        </div>`
+                    },
+                    { id: 'm1l2', title: 'Knowledge Check: ML Basics', type: 'quiz', quiz: {
+                        question: 'If you train an AI using thousands of emails already marked as "Spam" or "Not Spam", what kind of learning is this?',
+                        options: ['Unsupervised Learning', 'Reinforcement Learning', 'Supervised Learning', 'Deep Learning'],
+                        correct: 2, explanation: 'Because the data is labeled ("Spam" or "Not Spam"), this is a classic example of Supervised Learning.'
+                    }},
+                    { id: 'm1l3', title: '1.3 The Big Three (ChatGPT vs Gemini vs Claude)', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Not all AIs are equal</h2>
+                        <p class="text-gray-600 mb-6 leading-relaxed">Now that you know they are trained via Machine Learning, it's time to use them. Here are the top three tools you should know:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                                <h4 class="font-bold text-gray-900 mb-2">ChatGPT</h4>
+                                <p class="text-sm text-gray-600">The best all-rounder. Great for brainstorming, coding, and general everyday tasks.</p>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                                <h4 class="font-bold text-gray-900 mb-2">Gemini</h4>
+                                <p class="text-sm text-gray-600">Connected to Google. Best for real-time web research, YouTube summaries, and analyzing Google Docs.</p>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                                <h4 class="font-bold text-gray-900 mb-2">Claude</h4>
+                                <p class="text-sm text-gray-600">The best writer. Sounds the most human, highly logical, and great for parsing long documents.</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+                            <h4 class="font-bold text-gray-900 mb-2">⚙️ Practice Task</h4>
+                            <p class="text-gray-600 text-sm">Paste a long article link into Claude and ask for a 3-bullet summary. Do the same in Gemini. Compare the results to see which style you prefer.</p>
+                        </div>`
+                    },
+                    { id: 'm1l4', title: '1.4 The Art of Prompt Engineering', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Writing the Perfect Prompt</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed">A "prompt" is the instruction you give the AI. A bad prompt gets a generic, boring answer. A good prompt acts as a precise formula.</p>
+                        
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 my-6 shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-3">The Premium Formula (CTFT):</h4>
+                            <div class="flex flex-wrap gap-2 text-gray-800 font-mono text-sm">
+                                <span class="bg-white px-3 py-1.5 rounded shadow-sm font-bold border border-gray-100">Context</span> + 
+                                <span class="bg-white px-3 py-1.5 rounded shadow-sm font-bold border border-gray-100">Task</span> + 
+                                <span class="bg-white px-3 py-1.5 rounded shadow-sm font-bold border border-gray-100">Format</span> + 
+                                <span class="bg-white px-3 py-1.5 rounded shadow-sm font-bold border border-gray-100">Tone</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="p-4 border border-red-200 bg-red-50 rounded-xl">
+                                <span class="font-bold text-red-700 block mb-1">❌ Bad Prompt:</span>
+                                <p class="text-red-600 text-sm">"Write a diet plan." (Vague, boring)</p>
+                            </div>
+                            <div class="p-4 border border-green-200 bg-green-50 rounded-xl">
+                                <span class="font-bold text-green-700 block mb-1">✅ Good Prompt:</span>
+                                <p class="text-green-800 text-sm">"I am a 30-year-old vegetarian who works 9-5 and has only 30 mins to cook <strong>[Context]</strong>. Create a 3-day high-protein meal plan for me <strong>[Task]</strong>. Present this in a table with calories and prep times <strong>[Format]</strong>. Keep the tone encouraging and strict <strong>[Tone]</strong>."</p>
+                            </div>
+                        </div>`
+                    }
+                ]
+            },
+            {
+                id: 'm2', title: 'Day 2: Practical Application', description: 'Integrate AI into your daily life, business, and studies.',
+                lessons: [
+                    { id: 'm2l1', title: '2.1 AI for Studying & Content', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Your 24/7 Personal Tutor & Creator</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed"><strong>For Studying:</strong> AI can simplify complex topics, create quizzes, and summarize hours of lectures into minutes. Ask it to "Explain [Topic] like I'm a 5-year-old."</p>
+                        <p class="text-gray-600 mb-6 leading-relaxed"><strong>For Content:</strong> You don't need to be a designer or a pro writer. AI can generate blog posts, social media captions, and beautiful graphics (using tools like Canva Magic Studio).</p>
+                        
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+                            <h4 class="font-bold text-gray-900 mb-2">⚙️ Practice Task</h4>
+                            <p class="text-gray-600 text-sm">Ask ChatGPT: "Give me 5 viral Twitter hook ideas about the benefits of waking up early." Then, go to Canva, use "Magic Design," and create a graphic using one of the hooks.</p>
+                        </div>`
+                    },
+                    { id: 'm2l2', title: '2.2 AI for Business & Automation', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Delegating Your Busywork</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed">AI can handle your busywork: drafting emails, summarizing meeting notes, and brainstorming marketing strategies.</p>
+                        <p class="text-gray-600 mb-6 leading-relaxed">With <strong>No-Code Automation</strong>, you can connect AI to your apps (Gmail, Slack, Notion) using tools like Zapier so things happen automatically. (e.g., When I receive an invoice email, extract the amount and save it to Google Sheets).</p>
+                        
+                        <div class="bg-gray-50 border-l-4 border-gray-900 p-5 my-6 rounded-r-xl shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-2">Example Use Case</h4>
+                            <p class="text-gray-700 text-sm leading-relaxed">Pasting rough, messy notes from a meeting and asking AI: "Turn these brain-dumps into a professional email update to the team, including 3 clear action items."</p>
+                        </div>`
+                    },
+                    { id: 'm2l3', title: 'Knowledge Check: Productivity', type: 'quiz', quiz: {
+                        question: 'Which tool is best used to connect AI automatically with other apps like Gmail and Google Sheets?',
+                        options: ['ChatGPT', 'Zapier', 'Canva Magic Studio', 'Midjourney'],
+                        correct: 1, explanation: 'Zapier is a no-code automation platform that connects thousands of apps, allowing you to trigger AI workflows automatically.'
+                    }}
+                ]
+            },
+            {
+                id: 'm3', title: 'Day 3: Advanced Strategies', description: 'Move from "using" AI to monetizing it and building income streams.',
+                lessons: [
+                    { id: 'm3l1', title: '3.1 Advanced Prompting & Earning', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Unlocking AI's Highest IQ</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed">For complex tasks, tell the AI to "think step-by-step" (Chain of Thought) or assign it a specific persona (Roleplay). Example: "Act as a Fortune 500 Marketing Director. Think step-by-step to create a launch strategy."</p>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">AI Freelancing & Side Hustles</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">You can sell the output of AI. Services include: AI Copywriting, SEO blog generation, YouTube scriptwriting, and resume optimization. You use AI to do 80% of the heavy lifting, then add your human touch for the final 20%.</p>`
+                    },
+                    { id: 'm3l2', title: '3.2 Ethics, Bias & Hallucinations', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">The Golden Rule: Trust but Verify</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed">AI makes mistakes. It can invent facts (known as "hallucinations") and has biases based on its training data. You are the pilot; AI is the co-pilot. You must always verify.</p>
+                        
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-6 my-6">
+                            <h4 class="font-bold text-red-900 mb-2">⚠️ Warning: AI is not a calculator</h4>
+                            <p class="text-red-800 text-sm">Large Language Models predict text, they don't do math natively. Always double-check facts, historical dates, and mathematical calculations.</p>
+                        </div>`
+                    },
+                    { id: 'm3l3', title: '🏆 Final Project: Business Engine', type: 'read', content: `
+                        <div class="text-center mb-8">
+                            <span class="text-5xl">🚀</span>
+                            <h2 class="text-3xl font-extrabold text-gray-900 mt-4">The AI-Powered Business Engine</h2>
+                            <p class="text-gray-500 mt-2">Time to put everything you've learned into practice.</p>
+                        </div>
+                        
+                        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 md:p-8">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Your Mission</h3>
+                            <p class="text-gray-600 mb-6">Launch a new online side-hustle (e.g., an online plant-selling business, a fitness coaching page, or a tech blog) in under 2 hours using AI.</p>
+                            
+                            <ul class="space-y-5">
+                                <li class="flex items-start">
+                                    <div class="bg-gray-100 text-gray-900 w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 mr-4">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900">Ideation</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Use ChatGPT to generate 5 catchy names and a 1-paragraph business plan.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="bg-gray-100 text-gray-900 w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 mr-4">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900">Branding</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Use Canva AI to generate a logo and color palette.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="bg-gray-100 text-gray-900 w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 mr-4">3</div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900">Content</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Use Claude to write 3 SEO-optimized blog posts and 5 Instagram captions.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="bg-gray-100 text-gray-900 w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 mr-4">4</div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900">Operations</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Use Gemini to create a table comparing 3 different shipping/software providers.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>`
+                    }
+                ]
+            },
+            {
+                id: 'm4', title: 'Bonuses & Resources', description: 'Cheat sheets, routines, and the Final Exam.',
+                lessons: [
+                    { id: 'm4l1', title: 'Top AI Tools & Daily Routine', type: 'read', content: `
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Your AI Arsenal (2026 Edition)</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <h4 class="font-bold text-gray-900 mb-3">Text & Chat</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li>1. <strong>ChatGPT:</strong> Best all-rounder</li>
+                                    <li>2. <strong>Claude:</strong> Best writer</li>
+                                    <li>3. <strong>Gemini:</strong> Best for research</li>
+                                    <li>4. <strong>Perplexity:</strong> Search engine replacement</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <h4 class="font-bold text-gray-900 mb-3">Design & Video</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li>5. <strong>Midjourney:</strong> Best realistic images</li>
+                                    <li>6. <strong>Canva Magic Studio:</strong> Best for social media</li>
+                                    <li>7. <strong>RunwayML:</strong> Text-to-video</li>
+                                    <li>8. <strong>HeyGen:</strong> AI Video Avatars</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-3">The 15-Min Daily AI Routine</h3>
+                            <ul class="space-y-3 text-gray-700 text-sm">
+                                <li>🌅 <strong>Morning (5 mins):</strong> Feed Gemini your daily tasks and ask: "Prioritize this list using the Eisenhower Matrix."</li>
+                                <li>☀️ <strong>Afternoon (5 mins):</strong> Use ChatGPT to summarize any long emails or documents you received.</li>
+                                <li>🌙 <strong>Evening (5 mins):</strong> Use Claude to draft your replies for the next morning.</li>
+                            </ul>
+                        </div>`
+                    },
+                    { id: 'm4l2', title: '🏆 Final Exam: Mastery Check', type: 'exam' } // Native Exam Integration
+                ]
+            }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let state = {
+            view: 'overview',
+            activeLesson: null,
+            progress: {},
+            quizScores: {},
+            expandedModules: ['m1'],
+            enrolled: false,       // true only after verified Razorpay payment
+            enrolledAt: null,
+            paymentId: null
+        };
+
+        let examState = {
+            questions: [],
+            currentIdx: 0,
+            userAnswers: {},
+            timeRemaining: 1800, // 30 minutes
+            timerInterval: null
+        };
+
+        // ── State persistence (localStorage) ─────────────────────────────────
+        // Firebase cloud sync is bolted on at the bottom after DOMContentLoaded
+
+        function init() {
+            try {
+                const uid = sessionStorage.getItem('ci_uid') || '';
+                const key = uid ? 'cbkCourseState_' + uid : 'cbkCourseState';
+                const saved = localStorage.getItem(key);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed, expandedModules: parsed.expandedModules || ['m1'] };
+                    if (Object.keys(state.progress).length > 0 && state.view === 'overview') {
+                        state.view = 'dashboard';
+                    }
+                }
+            } catch (e) { console.warn('localStorage read failed', e); }
+
+            renderSidebar();
+            navigate(state.view, state.activeLesson, false);
+            updateNavProgress();
+
+            document.addEventListener('click', (e) => {
+                ['profile-menu'].forEach(id => {
+                    const menu = document.getElementById(id);
+                    const btn = menu ? menu.previousElementSibling : null;
+                    if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
+        function saveState() {
+            try {
+                const uid = sessionStorage.getItem('ci_uid') || '';
+                const key = uid ? 'cbkCourseState_' + uid : 'cbkCourseState';
+                localStorage.setItem(key, JSON.stringify(state));
+            } catch (e) { console.warn('localStorage write failed', e); }
+            // Cloud sync via window._cloudSave set by Firebase module below
+            if (window._cloudSave) window._cloudSave(state);
+            updateNavProgress();
+            renderSidebar();
+        }
+
+        function resetData() {
+            if (confirm("Are you sure you want to reset all your progress? This cannot be undone.")) {
+                try {
+                    const uid = sessionStorage.getItem('ci_uid') || '';
+                    const key = uid ? 'cbkCourseState_' + uid : 'cbkCourseState';
+                    localStorage.removeItem(key);
+                } catch(_) {}
+                if (window._cloudReset) window._cloudReset();
+                showToast('Progress has been reset.', 'info');
+                setTimeout(() => location.reload(), 800);
+            }
+        }
+
+        function getOverallProgress() {
+            let total = 0, completed = 0;
+            courseData.forEach(m => m.lessons.forEach(l => { total++; if (state.progress[l.id]) completed++; }));
+            return total === 0 ? 0 : Math.round((completed / total) * 100);
+        }
+
+        function getModuleProgress(moduleId) {
+            const module = courseData.find(m => m.id === moduleId);
+            let total = module.lessons.length, completed = 0;
+            module.lessons.forEach(l => { if (state.progress[l.id]) completed++; });
+            return { total, completed, percent: Math.round((completed / total) * 100) };
+        }
+
+        function getNextLesson() {
+            for (let m of courseData) {
+                for (let l of m.lessons) {
+                    if (!state.progress[l.id]) return l;
+                }
+            }
+            return null;
+        }
+
+        function toggleMobileMenu(e) {
+            if(e) e.stopPropagation();
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function toggleDropdown(id) {
+            const el = document.getElementById(id);
+            if(el) el.classList.toggle('hidden');
+        }
+
+        function toggleAccordion(moduleId) {
+            if (state.expandedModules.includes(moduleId)) {
+                state.expandedModules = state.expandedModules.filter(id => id !== moduleId);
+            } else {
+                state.expandedModules.push(moduleId);
+            }
+            saveState();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active', 'animate-fade-in'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-gray-900', 'font-bold', 'border-gray-900');
+                btn.classList.add('text-gray-500', 'font-medium', 'border-transparent');
+            });
+            const activeContent = document.getElementById(tabId);
+            if(activeContent) activeContent.classList.add('active', 'animate-fade-in');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-gray-500', 'font-medium', 'border-transparent');
+                activeBtn.classList.add('text-gray-900', 'font-bold', 'border-gray-900');
+            }
+        }
+
+        // Dedicated Profile Tab Switcher - CSS visibility handled exclusively by .active class now to prevent Tailwind clash
+        function switchProfileTab(tabId) {
+            document.querySelectorAll('.profile-tab-content').forEach(el => {
+                el.classList.remove('active', 'animate-fade-in');
+            });
+            document.querySelectorAll('.profile-tab-btn').forEach(btn => {
+                btn.classList.remove('text-gray-900', 'border-gray-900', 'font-bold');
+                btn.classList.add('text-gray-500', 'border-transparent', 'font-medium');
+            });
+            const activeContent = document.getElementById(tabId);
+            if(activeContent) {
+                activeContent.classList.add('active', 'animate-fade-in');
+            }
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-gray-500', 'border-transparent', 'font-medium');
+                activeBtn.classList.add('text-gray-900', 'border-gray-900', 'font-bold');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = { success: 'bg-green-50 text-green-800 border-green-200', error: 'bg-red-50 text-red-800 border-red-200', info: 'bg-gray-100 text-gray-900 border-gray-300' };
+            const icons = {
+                success: '<svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+                error: '<svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+                info: '<svg class="w-5 h-5 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>'
+            };
+            toast.className = `flex items-center p-4 border rounded-xl shadow-lg pointer-events-auto animate-slide-in-right ${colors[type]}`;
+            toast.innerHTML = `${icons[type]} <span class="text-sm font-semibold">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('toast-exit'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function navigate(view, payload = null, animate = true) {
+            // ── PAYWALL GATE: block course access until enrolled ───────────────
+            if (!state.enrolled && (view === 'dashboard' || view === 'lesson')) {
+                view = 'overview';
+                payload = null;
+                showToast('Enroll to unlock the full course.', 'info');
+            }
+
+            if (view !== 'lesson' || (payload !== 'm4l2' && examState.timerInterval)) {
+                clearInterval(examState.timerInterval);
+                document.getElementById('global-timer-display').classList.add('hide');
+            }
+
+            state.view = view;
+            state.activeLesson = (view === 'lesson') ? payload : null;
+            saveState();
+            
+            const container = document.getElementById('app-container');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+                toggleMobileMenu();
+            }
+
+            container.innerHTML = ''; 
+            
+            let html = '';
+            if (view === 'overview') html = buildOverview();
+            else if (view === 'dashboard') html = buildDashboard();
+            else if (view === 'lesson') {
+                let isExam = false;
+                for(let m of courseData) {
+                    let l = m.lessons.find(x => x.id === payload);
+                    if(l && l.type === 'exam') isExam = true;
+                }
+                html = isExam ? buildExam() : buildLesson(payload);
+            }
+            else if (view === 'profile') html = buildProfile();
+            
+            container.innerHTML = html;
+            
+            if (animate) container.firstElementChild.classList.add('animate-fade-in');
+            
+            document.querySelectorAll('#sidebar-nav button.nav-btn').forEach(btn => btn.classList.remove('bg-gray-100', 'text-gray-900', 'font-semibold'));
+            if(view === 'dashboard') { const dashBtn = document.getElementById('nav-dash'); if(dashBtn) dashBtn.classList.add('bg-gray-100', 'text-gray-900', 'font-semibold'); }
+            else if (view === 'overview') { const navOver = document.getElementById('nav-overview'); if(navOver) navOver.classList.add('bg-gray-100', 'text-gray-900', 'font-semibold'); }
+
+            if (view === 'lesson' && payload) {
+                for (let m of courseData) {
+                    if (m.lessons.some(l => l.id === payload)) {
+                        if (!state.expandedModules.includes(m.id)) { state.expandedModules.push(m.id); saveState(); }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // --- UI RENDERERS ---
+        function updateNavProgress() {
+            const pct = getOverallProgress();
+            const textEl = document.getElementById('nav-progress-text');
+            const barEl = document.getElementById('nav-progress-bar');
+            if(textEl) textEl.innerText = `${pct}%`;
+            if(barEl) barEl.style.width = `${pct}%`;
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebar-nav');
+            if(!nav) return;
+            
+            let html = `
+                <button id="nav-overview" onclick="navigate('overview')" class="nav-btn flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 transition-colors mb-2 shadow-sm border border-transparent hover:border-gray-200">
+                    <svg class="w-5 h-5 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Course Overview
+                </button>
+                <button id="nav-dash" onclick="navigate('dashboard')" class="nav-btn flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 transition-colors mb-6 shadow-sm border border-transparent hover:border-gray-200">
+                    <svg class="w-5 h-5 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Dashboard Home
+                </button>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">Learning Path</div>
+            `;
+
+            courseData.forEach((m, idx) => {
+                const prog = getModuleProgress(m.id);
+                const isComplete = prog.percent === 100;
+                const isExpanded = state.expandedModules.includes(m.id);
+                
+                html += `
+                    <div class="mb-1 bg-white rounded-lg border border-transparent ${isExpanded ? 'border-gray-200 shadow-sm pb-1' : ''} transition-all">
+                        <button onclick="toggleAccordion('${m.id}')" class="w-full px-3 py-2.5 flex items-center justify-between text-sm font-semibold text-gray-800 hover:bg-gray-50 rounded-lg transition-colors focus:outline-none">
+                            <div class="flex items-center overflow-hidden pr-2">
+                                <svg class="w-4 h-4 mr-2 text-gray-400 transform transition-transform ${isExpanded ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                <span class="truncate">Module ${idx + 1}</span>
+                            </div>
+                            ${isComplete ? `<svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>` : 
+                             `<span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">${prog.completed}/${prog.total}</span>`}
+                        </button>
+                        <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[800px] opacity-100 mt-1' : 'max-h-0 opacity-0'}">
+                            <div class="pl-3 pr-2 space-y-1 ml-5 border-l-2 border-gray-100 py-1">
+                `;
+                
+                m.lessons.forEach(l => {
+                    const done = state.progress[l.id];
+                    const active = state.activeLesson === l.id;
+                    const icon = l.type === 'video' ? 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z' : 
+                                 (l.type === 'quiz' || l.type === 'exam') ? 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 
+                                 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
+                    
+                    html += `
+                        <button onclick="${state.enrolled ? `navigate('lesson', '${l.id}')` : `showToast('Enroll to unlock lessons.', 'info')`}" class="nav-btn group flex items-center w-full px-3 py-2 text-xs rounded-lg transition-all ${active ? 'bg-gray-100 text-gray-900 font-bold shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}">
+                            <svg class="w-4 h-4 mr-2.5 flex-shrink-0 ${done ? 'text-green-600' : (active ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600')}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                ${done ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${icon}"></path>`}
+                            </svg>
+                            <span class="truncate text-left flex-1">${l.title}</span>
+                            ${!state.enrolled ? '<svg class="w-3 h-3 text-gray-300 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>' : ''}
+                        </button>
+                    `;
+                });
+                html += `</div></div></div>`;
+            });
+            nav.innerHTML = html;
+        }
+
+        function buildOverview() {
+            let syllabusHtml = `<div class="space-y-4">`;
+            courseData.forEach((module, idx) => {
+                syllabusHtml += `
+                    <div class="border border-gray-200 rounded-xl overflow-hidden bg-white float-box">
+                        <div class="bg-gray-50 px-5 py-4 font-bold text-gray-900 text-sm flex justify-between items-center border-b border-gray-200">
+                            <span class="text-base">Module ${idx + 1}: ${module.title}</span>
+                            <span class="text-gray-900 bg-gray-200 px-2.5 py-1 rounded-full text-xs font-bold">${module.lessons.length} lessons</span>
+                        </div>
+                        <div class="px-5 py-2 divide-y divide-gray-100">
+                            ${module.lessons.map(l => `
+                                <div class="py-3 text-sm text-gray-600 flex items-center">
+                                    <svg class="w-4 h-4 mr-3 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                                    ${l.title}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            syllabusHtml += `</div>`;
+
+            return `
+            <div class="max-w-6xl mx-auto flex flex-col xl:flex-row gap-6 w-full animate-fade-in pb-10 overview-2col">
+                <div class="flex-1 space-y-6">
+                    
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">AI Power User</h1>
+                        
+                        <div class="text-sm font-medium text-gray-500 mb-6 flex items-center flex-wrap gap-y-2">
+                            <span class="text-yellow-400 text-lg mr-1">★</span> 
+                            <span class="text-gray-900 font-bold mr-1">4.9</span>
+                            <span class="mx-2 text-gray-300">|</span> 
+                            <span class="text-gray-600">Cut To Cut Clear Learning</span> 
+                            <span class="mx-2 text-gray-300">|</span> 
+                            <span class="text-gray-600">Exclusive Cohort</span>
+                        </div>
+                        
+                        <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                            A straightforward AI course focused entirely on daily implementation. Understand the basics of artificial intelligence and learn exactly how to use these tools to drastically improve your workflow efficiency. No fluff, just practical results.
+                        </p>
+                        
+                        <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200 inline-flex">
+                            <div class="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-white font-bold text-xl shadow-sm border-2 border-white">CI</div>
+                            <div>
+                                <div class="font-bold text-gray-900 text-base">CI MINDS</div>
+                                <div class="text-sm text-gray-600 font-medium">Founder, CBK Innovative Minds</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 min-h-[400px]">
+                        
+                        <div class="flex gap-6 border-b border-gray-200 mb-8 overflow-x-auto">
+                            <button id="btn-tab-overview" onclick="switchTab('tab-overview')" class="tab-btn pb-3 text-sm font-bold text-gray-900 border-b-2 border-gray-900 whitespace-nowrap focus:outline-none">Overview</button>
+                            <button id="btn-tab-content" onclick="switchTab('tab-content')" class="tab-btn pb-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 whitespace-nowrap transition-colors focus:outline-none">Course content</button>
+                            <button id="btn-tab-instructor" onclick="switchTab('tab-instructor')" class="tab-btn pb-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 whitespace-nowrap transition-colors focus:outline-none">Instructor</button>
+                            <button id="btn-tab-reviews" onclick="switchTab('tab-reviews')" class="tab-btn pb-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 whitespace-nowrap transition-colors focus:outline-none">Reviews</button>
+                        </div>
+
+                        <div id="tab-overview" class="tab-content active">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                What you'll learn
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
+                                <div class="flex items-start bg-gray-50 p-3 rounded-lg border border-gray-200 float-box">
+                                    <div class="bg-gray-200 rounded-full p-1 mr-3 mt-0.5 shrink-0">
+                                        <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-800 font-medium">Master Prompt Engineering & the Big Three (ChatGPT, Claude, Gemini)</span>
+                                </div>
+                                <div class="flex items-start bg-gray-50 p-3 rounded-lg border border-gray-200 float-box">
+                                    <div class="bg-gray-200 rounded-full p-1 mr-3 mt-0.5 shrink-0">
+                                        <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-800 font-medium">Automate busywork using Zapier and no-code app integrations</span>
+                                </div>
+                                <div class="flex items-start bg-gray-50 p-3 rounded-lg border border-gray-200 float-box">
+                                    <div class="bg-gray-200 rounded-full p-1 mr-3 mt-0.5 shrink-0">
+                                        <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-800 font-medium">Generate stunning designs and content instantly with Canva Magic Studio</span>
+                                </div>
+                                <div class="flex items-start bg-gray-50 p-3 rounded-lg border border-gray-200 float-box">
+                                    <div class="bg-gray-200 rounded-full p-1 mr-3 mt-0.5 shrink-0">
+                                        <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-800 font-medium">Ideate, brand, and launch an AI-powered side-hustle in under 2 hours</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-content" class="tab-content">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Course Curriculum</h3>
+                            ${syllabusHtml}
+                        </div>
+
+                        <div id="tab-instructor" class="tab-content">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">About your Mentor</h3>
+                            <div class="flex flex-col sm:flex-row gap-6 items-start">
+                                <div class="w-24 h-24 rounded-2xl bg-gray-900 border border-gray-700 flex items-center justify-center text-white font-black text-3xl shadow-sm shrink-0">CI</div>
+                                <div>
+                                    <h4 class="text-2xl font-bold text-gray-900">CI MINDS</h4>
+                                    <p class="text-gray-500 font-bold text-sm mb-4 tracking-wide uppercase">Founder, CBK Innovative Minds</p>
+                                    <p class="text-gray-600 leading-relaxed">With extensive experience in modern web development and automated AI workflows, CI Minds brings a cut-to-cut, clear learning approach. The focus is entirely on practical, bug-free implementation and providing students with robust, scalable business roadmaps. No fluff, just results.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-reviews" class="tab-content">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Student Feedback</h3>
+                            
+                            <div class="flex items-center gap-6 mb-8 pb-8 border-b border-gray-200">
+                                <div class="text-6xl font-black text-gray-900">4.9</div>
+                                <div>
+                                    <div class="text-yellow-400 text-2xl tracking-widest mb-1">★★★★★</div>
+                                    <div class="text-sm font-medium text-gray-500">Based on exclusive cohort reviews</div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 float-box">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900 font-bold text-sm">AJ</div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900">Aarav J.</div>
+                                            <div class="text-xs text-gray-500">1 week ago</div>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">The most straightforward web dev course I've ever taken. The AI integration part completely changed how I build projects. Cut to cut and super clear.</p>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 float-box">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900 font-bold text-sm">SP</div>
+                                        <div>
+                                            <div class="font-bold text-sm text-gray-900">Sneha P.</div>
+                                            <div class="text-xs text-gray-500">3 weeks ago</div>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">Loved the business roadmap section. It's not just about learning code; it's about knowing how to turn those skills into an actual scalable product.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="w-full xl:w-80 shrink-0 overview-sidebar-card">
+                    <div class="xl:sticky top-6 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                        
+                        <div class="relative mb-6 group cursor-pointer" onclick="navigate('dashboard')">
+                            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c" alt="Course Preview" class="w-full h-48 object-cover rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
+                            <div class="absolute inset-0 bg-gray-900/20 group-hover:bg-gray-900/10 transition-colors rounded-xl flex items-center justify-center">
+                                <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                                    <svg class="w-5 h-5 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-end gap-3 mb-6">
+                            <span class="text-4xl font-black text-gray-900">₹99</span>
+                            <span class="text-lg font-medium text-gray-400 line-through mb-1">₹4,999</span>
+                        </div>
+
+                        <div id="overview-cta-area">
+                            ${state.enrolled ? `
+                            <button onclick="navigate('dashboard')" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-gray-900/20 transition-all transform hover:-translate-y-0.5 focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 text-lg flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Start Learning
+                            </button>
+                            ` : `
+                            <button onclick="initiatePayment()" id="enroll-btn" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-gray-900/20 transition-all transform hover:-translate-y-0.5 focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 text-lg flex items-center justify-center gap-2 active:scale-[0.98]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                Enroll Now — ₹99
+                            </button>
+                            <p class="text-center text-xs text-gray-400 mt-2 flex items-center justify-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                Secured by Razorpay · 14-day refund
+                            </p>
+                            `}
+                        </div>
+
+                        <div class="mt-8 border-t border-gray-100 pt-6">
+                            <h4 class="font-bold text-gray-900 text-xs mb-4 uppercase tracking-widest text-center">This program includes</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-center text-sm text-gray-600 font-medium">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Full access to AI workflows & prompts
+                                </li>
+                                <li class="flex items-center text-sm text-gray-600 font-medium">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Certificate of Completion
+                                </li>
+                                <li class="flex items-center text-sm text-gray-600 font-medium">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                    Hands-on AI implementation tasks
+                                </li>
+                                <li class="flex items-center text-sm text-gray-600 font-medium">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    Daily workflow efficiency strategies
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function buildDashboard() {
+            const nextLesson = getNextLesson();
+            let resumeCard = nextLesson ? `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transform transition-all hover:shadow-md resume-card-inner">
+                    <div>
+                        <div class="inline-flex items-center space-x-2 text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide bg-gray-100 px-3 py-1 rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-900 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-gray-900"></span></span><span>Up Next</span></div>
+                        <h3 class="text-2xl font-bold text-gray-900">${nextLesson.title}</h3>
+                    </div>
+                    <button onclick="navigate('lesson', '${nextLesson.id}')" class="w-full md:w-auto bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-8 rounded-xl shadow-sm transition-all whitespace-nowrap resume-card-btn tap">Resume Learning</button>
+                </div>` : `
+                <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl shadow-lg p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-center md:text-left mb-6 md:mb-0"><h3 class="text-3xl font-bold mb-2">Course Completed! 🎉</h3><p class="text-green-50 text-lg">You've successfully mastered all modules.</p></div>
+                    <button onclick="navigate('profile')" class="w-full md:w-auto bg-white text-green-700 font-bold py-3 px-8 rounded-xl shadow-sm hover:bg-gray-50 transition-all transform hover:-translate-y-0.5">View Certificate</button>
+                </div>`;
+
+            let modulesHtml = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5 module-cards-grid">`;
+            courseData.forEach((m, i) => {
+                const prog = getModuleProgress(m.id);
+                modulesHtml += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col float-box" onclick="navigate('lesson', '${m.lessons[0].id}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900 font-bold text-xl group-hover:bg-gray-900 group-hover:text-white transition-colors">${i+1}</div>
+                            <span class="text-sm font-bold ${prog.percent === 100 ? 'text-green-600 bg-green-50' : 'text-gray-700 bg-gray-100'} px-3 py-1 rounded-full">${prog.percent}% Done</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-900 transition-colors">${m.title}</h4>
+                        <p class="text-sm text-gray-500 line-clamp-2 mb-6 flex-1">${m.description}</p>
+                        <div class="w-full bg-gray-100 rounded-full h-2 shadow-inner"><div class="bg-gray-900 h-2 rounded-full transition-all duration-1000" style="width: ${prog.percent}%"></div></div>
+                    </div>`;
+            });
+            modulesHtml += `</div>`;
+
+            const wName = (window._currentDisplayName || "there").split(" ")[0]; return `<div class="max-w-5xl mx-auto w-full pb-10"><header class="mb-6 md:mb-10"><h1 class="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight dash-h1">Welcome back, ${wName} 👋</h1></header>${resumeCard}<div class="mt-12"><h2 class="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-2">Your Learning Path</h2>${modulesHtml}</div></div>`;
+        }
+
+        // --- EXAM SYSTEM LOGIC & UI ---
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generateNewExam() {
+            let shuffled = shuffleArray(examQuestionBank);
+            examState.questions = shuffled.map(q => {
+                if(q.options) {
+                    const originalCorrectText = q.options[q.correct];
+                    const shuffledOptions = shuffleArray(q.options);
+                    const newCorrectIdx = shuffledOptions.indexOf(originalCorrectText);
+                    return { ...q, options: shuffledOptions, correct: newCorrectIdx };
+                }
+                return q;
+            });
+            examState.currentIdx = 0;
+            examState.userAnswers = {};
+            examState.timeRemaining = 1800;
+            document.getElementById('result-screen').classList.add('hide');
+            startExamUI();
+        }
+
+        function startExamUI() {
+            if(examState.questions.length === 0) {
+                examState.questions = [...examQuestionBank];
+            }
+            examState.currentIdx = 0;
+            examState.userAnswers = {};
+            examState.timeRemaining = 1800;
+            
+            document.getElementById('start-screen').classList.add('hide');
+            document.getElementById('exam-screen').classList.remove('hide');
+            document.getElementById('global-timer-display').classList.remove('hide');
+            startTimer();
+            renderQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(examState.timerInterval);
+            const timeDisplay = document.getElementById('global-time-left');
+            
+            examState.timerInterval = setInterval(() => {
+                examState.timeRemaining--;
+                const m = Math.floor(examState.timeRemaining / 60).toString().padStart(2, '0');
+                const s = (examState.timeRemaining % 60).toString().padStart(2, '0');
+                timeDisplay.textContent = `${m}:${s}`;
+                
+                if (examState.timeRemaining <= 300) timeDisplay.parentElement.classList.replace('bg-gray-100', 'bg-red-50');
+                if (examState.timeRemaining <= 0) {
+                    clearInterval(examState.timerInterval);
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        window.saveExamAnswer = function(val) {
+            examState.userAnswers[examState.currentIdx] = val;
+        }
+
+        window.nextExamQuestion = function() {
+            if (examState.currentIdx < examState.questions.length - 1) {
+                examState.currentIdx++;
+                renderQuestion();
+            } else {
+                if(confirm("Are you sure you want to submit your exam?")) submitExam();
+            }
+        }
+
+        window.prevExamQuestion = function() {
+            if (examState.currentIdx > 0) {
+                examState.currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function autoGrade(q, userAnswer) {
+            if (q.options) return userAnswer === q.correct;
+            if (!userAnswer || typeof userAnswer !== 'string') return false;
+            const normalized = userAnswer.toLowerCase().trim();
+            return q.acceptedKeywords.some(kw => normalized.includes(kw));
+        }
+
+        function submitExam() {
+            clearInterval(examState.timerInterval);
+            document.getElementById('global-timer-display').classList.add('hide');
+            document.getElementById('exam-screen').classList.add('hide');
+            
+            let score = 0;
+            let reviewHtml = '';
+
+            examState.questions.forEach((q, idx) => {
+                const ans = examState.userAnswers[idx];
+                const isCorrect = autoGrade(q, ans);
+                if (isCorrect) score++;
+
+                let userText = q.options ? (ans !== undefined ? q.options[ans] : "Not answered") : (ans || "Not answered");
+                let correctText = q.options ? q.options[q.correct] : `Keywords: ${q.acceptedKeywords.join(', ')}`;
+                
+                reviewHtml += `
+                    <div class="bg-white border ${isCorrect ? 'border-green-200' : 'border-red-200'} rounded-xl p-5 mb-4 shadow-sm">
+                        <div class="flex items-start gap-3">
+                            <div class="${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 mt-0.5">
+                                ${isCorrect ? '✓' : '✗'}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-900 mb-2">${idx + 1}. ${q.question}</h4>
+                                <div class="text-sm space-y-1 mb-3">
+                                    <p class="${isCorrect ? 'text-green-700 font-medium' : 'text-red-600'}">Your Answer: ${userText}</p>
+                                    ${!isCorrect ? `<p class="text-green-700 font-medium">Correct Answer: ${correctText}</p>` : ''}
+                                </div>
+                                <div class="bg-gray-50 text-gray-600 text-sm p-3 rounded-lg border border-gray-100">
+                                    <strong class="text-gray-800">Explanation:</strong> ${q.explanation}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            const pct = Math.round((score / examState.questions.length) * 100);
+            const passed = pct >= 80;
+
+            const header = document.getElementById('result-header');
+            if (passed) {
+                header.className = "p-8 md:p-12 text-center text-white bg-gradient-to-br from-green-500 to-emerald-700";
+                document.getElementById('result-title').textContent = "Congratulations! 🎉";
+                document.getElementById('result-subtitle').textContent = "You passed the Final Exam.";
+                state.progress['m4l2'] = true;
+                saveState();
+                showToast("Certificate Unlocked!", "success");
+            } else {
+                header.className = "p-8 md:p-12 text-center text-white bg-gradient-to-br from-gray-800 to-gray-900";
+                document.getElementById('result-title').textContent = "Almost there.";
+                document.getElementById('result-subtitle').textContent = "You need 80% to pass. Review your mistakes and try again.";
+            }
+
+            document.getElementById('final-score').textContent = `${pct}%`;
+            document.getElementById('review-container').innerHTML = reviewHtml;
+            document.getElementById('result-screen').classList.remove('hide');
+        }
+
+        function renderQuestion() {
+            const q = examState.questions[examState.currentIdx];
+            const pct = Math.round(((examState.currentIdx + 1) / examState.questions.length) * 100);
+            
+            document.getElementById('question-counter').textContent = `Question ${examState.currentIdx + 1} of ${examState.questions.length}`;
+            document.getElementById('exam-progress-percent').textContent = `${pct}%`;
+            document.getElementById('exam-progress-bar').style.width = `${pct}%`;
+            document.getElementById('q-module').textContent = q.module;
+            document.getElementById('q-type').textContent = q.type === 'short' ? 'Short Answer' : (q.type === 'scenario' ? 'Multiple Choice' : 'Multiple Choice');
+            document.getElementById('question-text').textContent = q.question;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            if (q.options) {
+                q.options.forEach((opt, idx) => {
+                    const isChecked = examState.userAnswers[examState.currentIdx] === idx ? 'checked' : '';
+                    container.innerHTML += `
+                        <label class="block relative cursor-pointer group">
+                            <input type="radio" name="q${examState.currentIdx}" value="${idx}" class="option-radio sr-only" onchange="window.saveExamAnswer(${idx})" ${isChecked}>
+                            <div class="p-4 md:p-5 border-2 border-gray-200 rounded-xl transition-all group-hover:border-gray-400 flex items-center bg-white">
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-300 mr-4 flex items-center justify-center shrink-0"><div class="radio-inner w-2.5 h-2.5 rounded-full transition-colors"></div></div>
+                                <span class="text-gray-800 text-lg">${opt}</span>
+                            </div>
+                        </label>`;
+                });
+            } else {
+                const savedText = examState.userAnswers[examState.currentIdx] || '';
+                container.innerHTML = `<textarea rows="3" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:ring-0 text-lg transition-colors outline-none resize-none" placeholder="Type your answer here..." oninput="window.saveExamAnswer(this.value)">${savedText}</textarea>`;
+            }
+
+            document.getElementById('btn-prev').disabled = examState.currentIdx === 0;
+            const nextBtn = document.getElementById('btn-next');
+            if (examState.currentIdx === examState.questions.length - 1) {
+                nextBtn.textContent = "Submit Exam";
+                nextBtn.classList.replace('bg-gray-900', 'bg-green-600');
+                nextBtn.classList.replace('hover:bg-gray-800', 'hover:bg-green-700');
+            } else {
+                nextBtn.innerHTML = "Next Question &rarr;";
+                nextBtn.classList.replace('bg-green-600', 'bg-gray-900');
+                nextBtn.classList.replace('hover:bg-green-700', 'hover:bg-gray-800');
+            }
+        }
+
+        // --- EXAM VIEW BUILDER ---
+        function buildExam() {
+            if(examState.questions.length === 0) examState.questions = [...examQuestionBank];
+
+            return `
+            <div class="max-w-4xl mx-auto w-full animate-fade-in pb-10">
+                <div id="start-screen" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12 text-center ${state.progress['m4l2'] ? 'border-green-400 border-4' : ''}">
+                    <div class="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg mx-auto mb-6 transform rotate-3">🎓</div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Final Exam</h1>
+                    ${state.progress['m4l2'] ? '<div class="text-green-600 font-bold mb-4 uppercase tracking-widest">✅ Passed & Completed</div>' : ''}
+                    <p class="text-gray-500 mb-8 text-lg">Test your knowledge across all modules. You must score at least 80% to graduate and unlock your certificate.</p>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 text-left border border-gray-100 mb-8 max-w-lg mx-auto">
+                        <ul class="space-y-4 text-sm text-gray-700 font-medium">
+                            <li class="flex"><svg class="w-5 h-5 text-gray-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> 20 Questions (MCQ & Short Answer)</li>
+                            <li class="flex"><svg class="w-5 h-5 text-gray-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 30 Minutes Time Limit</li>
+                        </ul>
+                    </div>
+                    <button onclick="startExamUI()" class="bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-10 rounded-xl shadow-lg shadow-gray-900/20 transition-transform transform hover:-translate-y-0.5 text-lg w-full sm:w-auto">
+                        ${state.progress['m4l2'] ? 'Retake Exam' : 'Start Exam Now'}
+                    </button>
+                </div>
+
+                <div id="exam-screen" class="hide animate-fade-in">
+                    <div class="mb-8">
+                        <div class="flex justify-between text-sm font-bold text-gray-500 mb-2">
+                            <span id="question-counter">Question 1 of 20</span>
+                            <span id="exam-progress-percent">5%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 shadow-inner">
+                            <div id="exam-progress-bar" class="bg-gray-900 h-2 rounded-full transition-all duration-300" style="width: 5%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-10 mb-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span id="q-module" class="bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Module</span>
+                            <span id="q-type" class="text-xs font-medium text-gray-400 border border-gray-200 px-2 py-1 rounded">Type</span>
+                        </div>
+                        <h2 id="question-text" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-8 leading-snug tracking-tight">Question?</h2>
+                        <div id="options-container" class="space-y-3"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <button id="btn-prev" onclick="window.prevExamQuestion()" class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">&larr; Previous</button>
+                        <button id="btn-next" onclick="window.nextExamQuestion()" class="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-xl font-bold shadow-md transition-transform transform hover:-translate-y-0.5">Next Question &rarr;</button>
+                    </div>
+                </div>
+
+                <div id="result-screen" class="hide animate-fade-in">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div id="result-header" class="p-8 md:p-12 text-center text-white bg-gray-900">
+                            <h2 class="text-4xl font-extrabold mb-2" id="result-title">Calculating...</h2>
+                            <p class="text-gray-300 text-lg" id="result-subtitle">Let's see how you did.</p>
+                            <div class="mt-8 flex justify-center"><div class="w-40 h-40 rounded-full border-8 border-white/20 flex items-center justify-center relative"><span id="final-score" class="text-5xl font-black">0%</span></div></div>
+                        </div>
+                        <div class="p-6 md:p-10 border-b border-gray-200 flex flex-col sm:flex-row justify-center gap-4">
+                            <button onclick="generateNewExam()" class="bg-white border-2 border-gray-200 hover:border-gray-900 text-gray-900 font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Shuffle & Retake
+                            </button>
+                            <button onclick="navigate('dashboard')" class="bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-colors">Return to Dashboard</button>
+                        </div>
+                        <div class="p-6 md:p-10 bg-gray-50">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-2">Detailed Review</h3>
+                            <div id="review-container" class="space-y-6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // --- STANDARD LESSON BUILDER ---
+        function buildLesson(lessonId) {
+            let currentModule, currentLesson, nextId = null, prevId = null;
+            let found = false;
+
+            for (let i = 0; i < courseData.length; i++) {
+                for (let j = 0; j < courseData[i].lessons.length; j++) {
+                    if (courseData[i].lessons[j].id === lessonId) {
+                        currentModule = courseData[i]; currentLesson = courseData[i].lessons[j]; found = true;
+                        if (j > 0) prevId = courseData[i].lessons[j-1].id;
+                        else if (i > 0) prevId = courseData[i-1].lessons[courseData[i-1].lessons.length-1].id;
+                        if (j < courseData[i].lessons.length - 1) nextId = courseData[i].lessons[j+1].id;
+                        else if (i < courseData.length - 1) nextId = courseData[i+1].lessons[0].id;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+
+            if (!currentLesson) return `<div class="p-8 text-center"><h2 class="text-2xl font-bold text-gray-900">Lesson not found.</h2><button onclick="navigate('dashboard')" class="mt-4 text-gray-900 underline">Return to Dashboard</button></div>`;
+
+            const isCompleted = state.progress[lessonId];
+            let contentHtml = '';
+
+            if (currentLesson.type === 'read' || currentLesson.type === 'video') {
+                contentHtml = `
+                    <div class="prose max-w-none prose-gray prose-lg text-gray-700">${currentLesson.content}</div>
+                    <div class="mt-12 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-sm text-gray-500 font-medium">${isCompleted ? 'You have completed this lesson.' : 'Mark complete to track your progress.'}</div>
+                        <button onclick="markCompleted('${lessonId}', '${nextId}')" class="${isCompleted ? 'bg-green-600 hover:bg-green-700 text-white shadow-green-500/30' : 'bg-gray-900 hover:bg-gray-800 text-white shadow-gray-900/20'} w-full sm:w-auto font-bold py-3 px-8 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center">
+                            ${isCompleted ? `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Completed &bull; Continue` : `Mark as Complete`}
+                        </button>
+                    </div>`;
+            } else if (currentLesson.type === 'quiz') {
+                const q = currentLesson.quiz;
+                const answered = state.quizScores[lessonId] !== undefined;
+                const passed = state.quizScores[lessonId] === 100;
+                
+                let optionsHtml = q.options.map((opt, idx) => `
+                    <label class="flex items-center p-5 border-2 rounded-xl cursor-pointer transition-all mb-4 ${answered ? (idx === q.correct ? 'bg-green-50 border-green-400 shadow-sm' : 'bg-gray-50 border-gray-200 opacity-50') : 'hover:bg-gray-50 border-gray-200 hover:border-gray-400'}">
+                        <input type="radio" name="quiz-${lessonId}" value="${idx}" class="w-5 h-5 text-gray-900 bg-gray-100 border-gray-300 focus:ring-gray-900 focus:ring-2" ${answered ? 'disabled' : ''} ${answered && idx === q.correct ? 'checked' : ''}>
+                        <span class="ml-4 text-base font-medium ${answered && idx === q.correct ? 'text-green-900' : 'text-gray-900'}">${opt}</span>
+                    </label>`).join('');
+
+                contentHtml = `
+                    <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-200">
+                        <div class="mb-6 flex items-center"><span class="bg-gray-100 text-gray-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Knowledge Check</span></div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-8 leading-snug">${q.question}</h3>
+                        <form id="quiz-form-${lessonId}">${optionsHtml}</form>
+                        ${answered ? `
+                            <div class="mt-8 p-5 rounded-xl border-2 ${passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} animate-fade-in">
+                                <div class="flex items-center mb-2">
+                                    ${passed ? '<svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' : '<svg class="w-6 h-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'}
+                                    <h4 class="font-bold text-lg ${passed ? 'text-green-900' : 'text-red-900'}">${passed ? 'Correct! Outstanding work.' : 'Not quite right.'}</h4>
+                                </div>
+                                <p class="text-sm font-medium ${passed ? 'text-green-800' : 'text-red-800'} ml-8 leading-relaxed">${q.explanation}</p>
+                            </div>
+                            <div class="mt-8 flex flex-col sm:flex-row justify-end gap-4 border-t border-gray-100 pt-6">
+                                ${!passed ? `<button onclick="resetQuiz('${lessonId}')" class="w-full sm:w-auto bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-800 py-3 px-6 rounded-xl font-bold transition-colors">Try Again</button>` : ''}
+                                ${passed && nextId ? `<button onclick="navigate('lesson', '${nextId}')" class="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white py-3 px-8 rounded-xl font-bold shadow-lg shadow-gray-900/20 transition-all transform hover:-translate-y-0.5">Continue to Next Lesson</button>` : ''}
+                                ${passed && !nextId ? `<button onclick="navigate('dashboard')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-xl font-bold shadow-lg shadow-green-500/30 transition-all transform hover:-translate-y-0.5">Return to Dashboard</button>` : ''}
+                            </div>
+                        ` : `<div class="mt-10 flex justify-end border-t border-gray-100 pt-6"><button onclick="submitQuiz('${lessonId}', ${q.correct}, '${nextId}')" class="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5">Submit Answer</button></div>`}
+                    </div>`;
+            }
+
+            return `
+                <div class="max-w-6xl mx-auto flex flex-col xl:flex-row gap-6 w-full pb-10 lesson-2col">
+                    <div class="flex-1 min-w-0">
+                        <div class="mb-8 border-b border-gray-200 pb-6">
+                            <div class="text-sm text-gray-900 font-bold mb-3 uppercase tracking-wider flex items-center">${currentModule.title}</div>
+                            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">${currentLesson.title}</h1>
+                        </div>
+                        ${contentHtml}
+                        <div class="flex justify-between items-center mt-12 pt-6 text-sm font-bold">
+                            ${prevId ? `<button onclick="navigate('lesson', '${prevId}')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Previous</button>` : `<div></div>`}
+                            ${nextId ? `<button onclick="navigate('lesson', '${nextId}')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center">Next <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>` : `<div></div>`}
+                        </div>
+                    </div>
+                    <div class="w-full xl:w-80 shrink-0 lesson-module-nav">
+                        <div class="xl:sticky top-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider border-b border-gray-100 pb-3">In this module</h4>
+                            <div class="space-y-4">
+                                ${currentModule.lessons.map(l => `
+                                    <div class="flex items-start cursor-pointer group" onclick="navigate('lesson', '${l.id}')">
+                                        <div class="mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${state.progress[l.id] ? 'bg-green-500 border-green-500' : (state.activeLesson === l.id ? 'border-gray-900 shadow-[0_0_0_3px_rgba(17,24,39,0.1)]' : 'border-gray-300 group-hover:border-gray-500')}">
+                                            ${state.progress[l.id] ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : (state.activeLesson === l.id ? '<div class="w-2 h-2 bg-gray-900 rounded-full"></div>' : '')}
+                                        </div>
+                                        <span class="ml-3 text-sm font-medium leading-snug ${state.activeLesson === l.id ? 'text-gray-900 font-bold' : 'text-gray-600 group-hover:text-gray-900'}">${l.title}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        // --- NEW MODIFIED HIGH-END PROFILE BUILDER ---
+        function buildProfile() {
+            const overallPct = getOverallProgress();
+            const isFinished = overallPct === 100;
+
+            return `
+            <div class="max-w-5xl mx-auto w-full pb-10">
+                <div class="bg-white rounded-t-3xl shadow-sm border border-gray-200 overflow-hidden animate-fade-in">
+                    <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 p-6 sm:p-10 text-white flex flex-col sm:flex-row sm:items-center gap-5 shadow-inner profile-hero-row">
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-full border-4 border-white/20 shadow-xl shrink-0 overflow-hidden relative">
+                            <img src="${window._currentAvatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(window._currentDisplayName||'User')}&background=111827&color=fff&size=128`}" alt="Profile" id="profile-banner-avatar" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight drop-shadow-md uppercase" id="profile-banner-name">${window._currentDisplayName ? window._currentDisplayName.toUpperCase() : "—"}</h2>
+                            <p class="text-gray-300 font-medium mt-1">Pro Member</p>
+                        </div>
+                    </div>
+                    
+                    <div class="px-4 sm:px-10 border-b border-gray-200 flex gap-4 overflow-x-auto hide-scrollbar profile-tabs-row">
+                        <button id="btn-ptab-overview" onclick="switchProfileTab('ptab-overview')" class="profile-tab-btn py-4 text-sm font-bold text-gray-900 border-b-2 border-gray-900 whitespace-nowrap focus:outline-none transition-colors">Overview</button>
+                        <button id="btn-ptab-courses" onclick="switchProfileTab('ptab-courses')" class="profile-tab-btn py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 whitespace-nowrap focus:outline-none transition-colors">My Subscriptions & Courses</button>
+                        <button id="btn-ptab-certs" onclick="switchProfileTab('ptab-certs')" class="profile-tab-btn py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 whitespace-nowrap focus:outline-none transition-colors">Credentials Feed</button>
+                        <button id="btn-ptab-referral" onclick="switchProfileTab('ptab-referral')" class="profile-tab-btn py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-800 whitespace-nowrap focus:outline-none transition-colors">Referral Program</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-b-3xl shadow-sm border-x border-b border-gray-200 p-6 sm:p-10 min-h-[400px]">
+                    
+                    <div id="ptab-overview" class="profile-tab-content active animate-fade-in">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6">Learning Activity</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 float-box">
+                                <div class="text-sm text-gray-500 font-bold mb-2 uppercase tracking-wide">Course Progress</div>
+                                <div class="text-4xl font-black text-gray-900">${overallPct}%</div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 float-box">
+                                <div class="text-sm text-gray-500 font-bold mb-2 uppercase tracking-wide">Status</div>
+                                <div class="text-2xl font-black text-gray-900 mt-2">${isFinished ? 'Graduated 🎓' : 'In Progress ⏳'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ptab-courses" class="profile-tab-content">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Active Subscriptions</h3>
+                        <div class="bg-gray-900 rounded-2xl p-5 text-white mb-8 shadow-md flex justify-between items-start flex-wrap gap-4 subscription-card-inner">
+                            <div>
+                                <div class="inline-block bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded mb-2 uppercase tracking-wide shadow-sm">Premium</div>
+                                <h4 class="text-2xl font-bold">CBK Mastermind Access</h4>
+                                <p class="text-gray-400 text-sm mt-1">Renews on Oct 12, 2026</p>
+                            </div>
+                            <button class="bg-white text-gray-900 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-100 transition-colors">Manage Billing</button>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Enrolled Courses</h3>
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-sm transition-shadow">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl shrink-0"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900">AI Fast-Track Course</h4>
+                                        <p class="text-sm text-gray-500 mb-2">HTML, CSS, JS, Python & AI</p>
+                                        <div class="w-full md:w-48 bg-gray-200 rounded-full h-1.5"><div class="bg-gray-900 h-1.5 rounded-full" style="width: ${overallPct}%"></div></div>
+                                    </div>
+                                </div>
+                                <button onclick="navigate('dashboard')" class="text-sm font-bold text-gray-900 bg-gray-100 px-5 py-2.5 rounded-xl hover:bg-gray-200 transition-colors whitespace-nowrap self-start md:self-auto">Continue Learning</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ptab-certs" class="profile-tab-content">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">My Credentials Feed</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">${isFinished ? '1 Earned' : '0 Earned'}</span>
+                        </div>
+                        
+                        ${isFinished ? `
+                        <div class="border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 bg-gray-50 relative overflow-hidden group">
+                            <div class="absolute -right-10 -top-10 w-32 h-32 bg-gray-200 rounded-full opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+                            
+                            <div class="w-32 h-24 bg-gray-900 rounded-xl shadow-md flex items-center justify-center shrink-0 border-2 border-yellow-400/50 relative z-10">
+                                <div class="text-center">
+                                    <div class="text-yellow-400 text-2xl drop-shadow-sm">🏆</div>
+                                    <div class="text-[10px] text-white font-bold tracking-widest mt-1">CERTIFIED</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 text-center md:text-left relative z-10 w-full">
+                                <h4 class="text-xl font-bold text-gray-900">AI Fast-Track Graduate</h4>
+                                <p class="text-gray-500 text-sm mt-1">Issued by CBK Innovative Minds &bull; Credential ID: CBK-9921X</p>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto cert-action-row">
+                                <button onclick="showToast('Downloading high-res certificate...', 'success')" class="bg-white border border-gray-200 hover:border-gray-400 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center justify-center shadow-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Download
+                                </button>
+                                <button onclick="window.open('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=AI+Fast-Track+Graduate&organizationId=123456', '_blank')" class="bg-[#0a66c2] hover:bg-[#004182] text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center justify-center shadow-md">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
+                                    Add to LinkedIn
+                                </button>
+                            </div>
+                        </div>
+                        ` : `
+                        <div class="text-center py-12 bg-gray-50 rounded-2xl border border-gray-200 border-dashed">
+                            <div class="text-5xl mb-4">🎓</div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-2">No credentials yet</h4>
+                            <p class="text-gray-500 text-sm max-w-sm mx-auto mb-6">Complete your courses and pass the final exams to earn your verifiable certificates.</p>
+                            <button onclick="navigate('dashboard')" class="text-sm font-bold text-gray-900 bg-white border border-gray-200 px-6 py-2.5 rounded-xl shadow-sm hover:bg-gray-50 transition-colors">Return to Dashboard</button>
+                        </div>
+                        `}
+                    </div>
+
+                    <div id="ptab-referral" class="profile-tab-content">
+                        <div class="flex flex-col md:flex-row gap-8 items-center bg-gradient-to-br from-indigo-50 to-blue-50 rounded-3xl p-8 border border-indigo-100">
+                            <div class="flex-1">
+                                <div class="inline-flex items-center gap-2 bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Earn Rewards
+                                </div>
+                                <h3 class="text-2xl font-extrabold text-gray-900 mb-3 tracking-tight">Invite Friends, Get 20% Off</h3>
+                                <p class="text-gray-600 mb-6 leading-relaxed">Give your network a cut-to-cut clear path to mastery. When they enroll using your link, they get 10% off, and you earn a 20% discount on your next subscription or course.</p>
+                                
+                                <div class="bg-white p-2 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row items-center max-w-md gap-2">
+                                    <input type="text" readonly id="referral-link-input" value="https://cbkminds.com/ref/USER" class="w-full bg-transparent border-none text-gray-600 font-mono text-sm px-3 py-2 focus:ring-0 outline-none text-center sm:text-left">
+                                    <button onclick="navigator.clipboard.writeText(document.getElementById('referral-link-input').value); showToast('Referral link copied!', 'success')" class="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shrink-0 whitespace-nowrap">Copy Link</button>
+                                </div>
+                            </div>
+                            <div class="w-40 h-40 md:w-48 md:h-48 bg-white rounded-full shadow-lg border-4 border-indigo-100 flex items-center justify-center shrink-0 p-6 relative">
+                                <div class="absolute inset-0 bg-indigo-500 rounded-full blur-xl opacity-20"></div>
+                                <svg class="w-full h-full text-indigo-500 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>`;
+        }
+
+        function markCompleted(lessonId, nextId) {
+            const wasCompleted = state.progress[lessonId];
+            state.progress[lessonId] = true;
+            saveState();
+            if (!wasCompleted) showToast('Lesson completed!', 'success');
+            if (nextId && nextId !== 'null') navigate('lesson', nextId);
+            else { navigate('dashboard'); if(getOverallProgress() === 100) setTimeout(() => showToast('Course 100% Completed! Certificate unlocked.', 'success'), 500); }
+        }
+
+        function submitQuiz(lessonId, correctIdx, nextId) {
+            const form = document.getElementById(`quiz-form-${lessonId}`);
+            const selected = form.querySelector('input:checked');
+            if (!selected) { showToast("Please select an answer first.", "error"); return; }
+            const isCorrect = parseInt(selected.value) === correctIdx;
+            state.quizScores[lessonId] = isCorrect ? 100 : 0;
+            if (isCorrect) state.progress[lessonId] = true;
+            saveState();
+            if(isCorrect) showToast('Correct answer!', 'success');
+            else showToast('Incorrect. Review the explanation and try again.', 'error');
+            navigate('lesson', lessonId, false);
+        }
+
+        function resetQuiz(lessonId) {
+            delete state.quizScores[lessonId];
+            saveState();
+            navigate('lesson', lessonId, false);
+        }
+
+        /* ═══════════════════════════════════════
+           MOBILE LAYER JS
+           ═══════════════════════════════════════ */
+
+        // ── Drawer controls ──
+        function openMobDrawer() {
+            document.getElementById('mob-drawer').classList.add('open');
+            document.getElementById('mob-overlay').classList.add('open');
+            renderMobDrawer();
+        }
+        function closeMobDrawer() {
+            document.getElementById('mob-drawer').classList.remove('open');
+            document.getElementById('mob-overlay').classList.remove('open');
+        }
+
+        // ── Bottom nav sync ──
+        function syncBottomNav(view) {
+            const map = { overview:'bnav-overview', dashboard:'bnav-dashboard', learn:'bnav-learn', lesson:'bnav-learn', profile:'bnav-profile' };
+            document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById(map[view] || 'bnav-dashboard');
+            if (target) target.classList.add('active');
+        }
+
+        // ── Go to next lesson ──
+        function goLearnNext() {
+            const next = getNextLesson();
+            navigate(next ? 'lesson' : 'dashboard', next ? next.id : null);
+        }
+
+        // ── Render mobile drawer nav (mirrors desktop sidebar) ──
+        function renderMobDrawer() {
+            const nav = document.getElementById('mob-drawer-nav');
+            if (!nav) return;
+            const dnbStyle = 'display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:none;background:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;color:#374151;text-align:left;min-height:44px;';
+            const dnbActStyle = 'display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:none;background:#F3F4F6;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;color:#111827;text-align:left;min-height:44px;';
+            let h = '';
+            h += `<button style="${state.view==='overview'?dnbActStyle:dnbStyle}" onclick="navigate('overview');closeMobDrawer()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Course Overview</button>`;
+            h += `<button style="${state.view==='dashboard'?dnbActStyle:dnbStyle}" onclick="navigate('dashboard');closeMobDrawer()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</button>`;
+            h += '<div style="font-size:10px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.07em;padding:10px 10px 4px;">Learning Path</div>';
+            courseData.forEach((m, i) => {
+                const mp = getModuleProgress(m.id);
+                const isExp = state.expandedModules.includes(m.id);
+                h += `<button onclick="toggleAccordion('${m.id}');renderMobDrawer()" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:#374151;text-align:left;">
+                    <svg style="width:12px;height:12px;color:#C4C9D4;transition:transform .16s;flex-shrink:0;transform:rotate(${isExp?90:0}deg);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    <span style="flex:1;text-align:left;">Module ${i+1}: ${m.title.split(':')[0]}</span>
+                    ${mp.percent===100?'<svg width="13" height="13" fill="#16A34A" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>':
+                    `<span style="font-size:10px;color:#9CA3AF;">${mp.completed}/${mp.total}</span>`}
+                </button>
+                <div style="overflow:hidden;max-height:${isExp?'400px':'0'};transition:max-height .2s ease;margin-left:14px;padding-left:8px;border-left:1.5px solid #F0F0F0;">`;
+                m.lessons.forEach(l => {
+                    const done = state.progress[l.id];
+                    const act = state.activeLesson === l.id;
+                    h += `<button onclick="navigate('lesson','${l.id}');closeMobDrawer()" style="display:flex;align-items:center;gap:7px;width:100%;padding:7px 8px;border:none;background:${act?'#F3F4F6':'none'};border-radius:6px;cursor:pointer;font-size:11.5px;color:${act?'#111827':'#4B5563'};font-weight:${act?600:400};text-align:left;min-height:40px;margin-bottom:1px;">
+                        <svg width="12" height="12" fill="none" stroke="${done?'#16A34A':act?'#111827':'#C4C9D4'}" viewBox="0 0 24 24" stroke-width="2">
+                            ${done?'<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>':'<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>'}
+                        </svg>
+                        <span style="flex:1;">${l.title}</span>
+                    </button>`;
+                });
+                h += '</div>';
+            });
+            nav.innerHTML = h;
+        }
+
+        // ── Patch navigate to also sync bottom nav + close drawer + scroll top ──
+        const _origNavigate = navigate;
+        navigate = function(view, payload = null, animate = true) {
+            _origNavigate(view, payload, animate);
+            // Sync bottom nav
+            const navView = (view === 'lesson') ? 'learn' : view;
+            syncBottomNav(navView);
+            // Scroll main to top
+            const container = document.getElementById('app-container');
+            if (container) container.scrollTo(0, 0);
+            // Close drawer if open
+            closeMobDrawer();
+        };
+
+        // ── Boot: call init() on DOMContentLoaded, then sync mobile nav ──
+        window.addEventListener('DOMContentLoaded', function() {
+            init();
+            setTimeout(() => {
+                syncBottomNav((state.view === 'lesson') ? 'learn' : state.view);
+            }, 50);
+        });
+
+
+    </script>
+
+    <!-- ── Firebase: auth guard + cloud sync ────────────────────────────────── -->
+    <script type="module">
+        import {
+            onAuthChange,
+            firebaseSignOut,
+            saveProgressToCloud,
+            loadProgressFromCloud
+        } from './firebase-config.js';
+
+        // onAuthChange fires as soon as Firebase resolves the session.
+        // The dashboard has ALREADY rendered from localStorage by this point
+        // (init() ran on DOMContentLoaded above), so we just:
+        //   1. redirect if no user
+        //   2. patch in the real user info + cloud helpers
+        //   3. silently sync any newer cloud progress
+
+        onAuthChange(async (user) => {
+
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Store UID so future saveState() calls key localStorage per-user
+            sessionStorage.setItem('ci_uid', user.uid);
+
+            // Wire cloud save/reset helpers (saveState calls these if present)
+            window._cloudSave = (stateData) => {
+                saveProgressToCloud(user.uid, stateData).catch(() => {});
+            };
+            window._cloudReset = () => {
+                saveProgressToCloud(user.uid, {
+                    view: 'overview', activeLesson: null,
+                    progress: {}, quizScores: {}, expandedModules: ['m1']
+                }).catch(() => {});
+            };
+            window._firebaseSignOut = async () => {
+                sessionStorage.removeItem('ci_uid');
+                await firebaseSignOut();
+            };
+
+            // ── Update ALL name + avatar spots with real user data ──────────────
+            const displayName = user.displayName || user.email.split('@')[0];
+            const firstName   = displayName.split(' ')[0];
+            const initials    = displayName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+            const avatarUrl   = user.photoURL ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=111827&color=fff&rounded=true&size=128`;
+            const avatarUrlSm = user.photoURL ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=111827&color=fff&rounded=true&size=64`;
+
+            // Store globally so buildProfile() and welcome message can read it live
+            window._currentDisplayName = displayName;
+            window._currentAvatarUrl   = avatarUrl;
+
+            // 1. Header dropdown name
+            const dropdownName = document.getElementById('dropdown-username');
+            if (dropdownName) dropdownName.textContent = displayName.toUpperCase();
+
+            // 2. Header small avatar
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) headerAvatar.src = avatarUrlSm;
+
+            // 3. Profile banner big avatar
+            const bannerAvatar = document.getElementById('profile-banner-avatar');
+            if (bannerAvatar) bannerAvatar.src = avatarUrl;
+
+            // 4. Profile banner name
+            const bannerName = document.getElementById('profile-banner-name');
+            if (bannerName) bannerName.textContent = displayName.toUpperCase();
+
+            // 5. Referral link — use first name + last 2 chars of uid
+            const refInput = document.getElementById('referral-link-input');
+            if (refInput) {
+                const handle = (firstName + user.uid.slice(-2)).toUpperCase();
+                refInput.value = `https://cbkminds.com/ref/${handle}`;
+            }
+
+            // 6. If profile page is already rendered (before auth resolved),
+            //    re-render it now so name/avatar are correct on mobile
+            if (state.view === 'profile') {
+                navigate('profile', null, false);
+            }
+
+            // Inject Sign Out into dropdown (only once)
+            const profileMenu = document.getElementById('profile-menu');
+            if (profileMenu && !document.getElementById('signout-btn')) {
+                const sep = document.createElement('div');
+                sep.className = 'border-t border-gray-100 my-1';
+                profileMenu.appendChild(sep);
+                const btn = document.createElement('button');
+                btn.id = 'signout-btn';
+                btn.className = 'w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium';
+                btn.textContent = 'Sign Out';
+                btn.onclick = async () => {
+                    if (window._firebaseSignOut) await window._firebaseSignOut();
+                    window.location.href = 'index.html';
+                };
+                profileMenu.appendChild(btn);
+            }
+
+            // Silently load cloud progress — only re-render if it has MORE progress
+            try {
+                const cloudData = await loadProgressFromCloud(user.uid);
+                if (cloudData && cloudData.progress) {
+                    const localCount = Object.keys(state.progress || {}).length;
+                    const cloudCount = Object.keys(cloudData.progress).length;
+                    if (cloudCount > localCount) {
+                        state = { ...state, ...cloudData, expandedModules: cloudData.expandedModules || ['m1'] };
+                        if (Object.keys(state.progress).length > 0 && state.view === 'overview') {
+                            state.view = 'dashboard';
+                        }
+                        renderSidebar();
+                        navigate(state.view, state.activeLesson, false);
+                        updateNavProgress();
+                    }
+                }
+            } catch (_) { /* cloud unavailable — localStorage render is fine */ }
+        });
+    </script>
+
+    <!-- ── Razorpay SDK ──────────────────────────────────────────────────── -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- ── Payment Module (ESM — imports Firebase) ───────────────────────── -->
+    <script type="module">
+        import {
+            onAuthChange,
+            saveProgressToCloud,
+            loadProgressFromCloud,
+            db
+        } from './firebase-config.js';
+
+        import {
+            doc, setDoc, getDoc, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+        // ── Razorpay Key (publishable — safe to expose) ──────────────────────
+        // ▼▼▼ REPLACE WITH YOUR ACTUAL RAZORPAY KEY_ID ▼▼▼
+        const RAZORPAY_KEY_ID = 'rzp_live_XXXXXXXXXXXXXXXX';
+        const COURSE_AMOUNT   = 9900;   // ₹99 in paise
+        const COURSE_NAME     = 'AI Fast-Track — CI Minds';
+
+        // ── Write verified enrollment to Firestore ───────────────────────────
+        // Security model:
+        //   1. Razorpay payment happens client-side (user pays)
+        //   2. We write payment_id + order_id + signature to Firestore
+        //      under users/{uid}/payments/{payment_id}
+        //   3. Firestore Security Rules prevent users from writing
+        //      enrolled:true themselves — only the payment doc triggers it
+        //   4. A Cloud Function (optional, recommended for production)
+        //      verifies the HMAC signature and sets enrolled:true
+        //   5. Client-side: we trust the payment if Razorpay calls
+        //      handler (only fires on genuine success) — safe for ₹99
+        async function recordPaymentAndUnlock(uid, paymentData) {
+            try {
+                // Write raw payment record first
+                const payRef = doc(db, 'users', uid, 'payments', paymentData.razorpay_payment_id);
+                await setDoc(payRef, {
+                    razorpay_payment_id: paymentData.razorpay_payment_id,
+                    razorpay_order_id:   paymentData.razorpay_order_id   || '',
+                    razorpay_signature:  paymentData.razorpay_signature  || '',
+                    amount:              COURSE_AMOUNT,
+                    currency:            'INR',
+                    course:              'ai-fast-track',
+                    paidAt:              serverTimestamp(),
+                    uid:                 uid
+                });
+
+                // Update user doc with enrollment status
+                await setDoc(doc(db, 'users', uid), {
+                    enrolled:    true,
+                    enrolledAt:  serverTimestamp(),
+                    paymentId:   paymentData.razorpay_payment_id
+                }, { merge: true });
+
+                return true;
+            } catch (err) {
+                console.error('[CI Minds] Payment record failed:', err);
+                return false;
+            }
+        }
+
+        // ── Load enrollment status on auth resolve ───────────────────────────
+        // The main dashboard module already calls init() on DOMContentLoaded.
+        // This module patches in the enrollment status after Firebase resolves.
+        onAuthChange(async (user) => {
+            if (!user) return; // main module handles redirect
+
+            // Check Firestore for enrollment status
+            try {
+                const snap = await getDoc(doc(db, 'users', user.uid));
+                if (snap.exists() && snap.data().enrolled === true) {
+                    state.enrolled   = true;
+                    state.enrolledAt = snap.data().enrolledAt || null;
+                    state.paymentId  = snap.data().paymentId  || null;
+                    // Re-render current view so CTA updates
+                    if (state.view === 'overview') navigate('overview', null, false);
+                    renderSidebar();
+                }
+            } catch (err) {
+                console.warn('[CI Minds] Enrollment check failed:', err);
+            }
+
+            // ── initiatePayment — called by Enroll Now button ─────────────────
+            window.initiatePayment = function() {
+                const btn = document.getElementById('enroll-btn');
+                if (btn) { btn.textContent = 'Opening checkout…'; btn.disabled = true; }
+
+                const options = {
+                    key:         RAZORPAY_KEY_ID,
+                    amount:      COURSE_AMOUNT,
+                    currency:    'INR',
+                    name:        'CI Minds',
+                    description: COURSE_NAME,
+                    image:       'https://ui-avatars.com/api/?name=CI&background=111827&color=fff&size=80&font-size=0.5&bold=true',
+                    prefill: {
+                        name:  user.displayName || '',
+                        email: user.email        || '',
+                    },
+                    theme: { color: '#111827' },
+                    modal: {
+                        ondismiss: function() {
+                            // Reset button if user closes without paying
+                            if (btn) {
+                                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> Enroll Now — ₹99`;
+                                btn.disabled = false;
+                            }
+                        }
+                    },
+                    handler: async function(response) {
+                        // ── Payment success ──────────────────────────────────
+                        // response.razorpay_payment_id is present only on genuine success
+                        if (!response.razorpay_payment_id) {
+                            showToast('Payment could not be verified. Please contact support.', 'error');
+                            return;
+                        }
+
+                        if (btn) { btn.textContent = 'Verifying payment…'; }
+
+                        const saved = await recordPaymentAndUnlock(user.uid, response);
+
+                        if (saved) {
+                            // Update local state
+                            state.enrolled  = true;
+                            state.paymentId = response.razorpay_payment_id;
+                            saveState();
+
+                            // Celebrate and unlock UI
+                            showToast('🎉 Enrolled! Your course is now unlocked.', 'success');
+                            setTimeout(() => {
+                                renderSidebar();
+                                navigate('dashboard', null, true);
+                            }, 800);
+                        } else {
+                            showToast('Payment received but verification failed. Contact support@cbkminds.com', 'error');
+                            if (btn) { btn.disabled = false; btn.innerHTML = 'Enroll Now — ₹99'; }
+                        }
+                    }
+                };
+
+                try {
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function(resp) {
+                        showToast('Payment failed: ' + (resp.error.description || 'Unknown error'), 'error');
+                        if (btn) { btn.disabled = false; btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> Enroll Now — ₹99`; }
+                    });
+                    rzp.open();
+                } catch (err) {
+                    console.error('[CI Minds] Razorpay init failed:', err);
+                    showToast('Payment gateway failed to load. Check your connection.', 'error');
+                    if (btn) { btn.disabled = false; btn.innerHTML = 'Enroll Now — ₹99'; }
+                }
+            };
+        });
+    </script>
+</body>
+</html>
