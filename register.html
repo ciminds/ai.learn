@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register for the course — CIMinds</title>
+<meta name="description" content="Reserve your seat for this course in two minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF9F4;
+  --surface:#FFFFFF;
+  --ink:#14201C;
+  --muted:#5C6660;
+  --accent:#0B6B57;
+  --accent-dark:#084F3F;
+  --accent-soft:#E6F2EE;
+  --border:#E3E0D5;
+  --radius:12px;
+  --maxw:720px;
+  --shadow:0 1px 2px rgba(20,32,28,0.04);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:'Sora',sans-serif;margin:0 0 .4em;letter-spacing:-0.01em;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+.topbar{border-bottom:1px solid var(--border);background:var(--surface);}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;} 
+.brand{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--ink);}
+
+.brand-logo{height:60px;width:auto;object-fit:contain;display:block;}
+
+.topbar-link{font-size:14px;color:var(--muted);text-decoration:none;}
+.topbar-link:hover{color:var(--accent);}
+
+.hero{padding:64px 0 48px;}
+.eyebrow{color:var(--accent-dark);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 14px;}
+.hero h1{font-size:34px;font-weight:700;color:var(--ink);}
+.hero-sub{color:var(--muted);font-size:16px;max-width:520px;margin:0 0 28px;}
+.price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:28px;}
+.price-now{font-family:'Sora',sans-serif;font-size:32px;font-weight:700;color:var(--accent-dark);}
+.price-label{color:var(--muted);font-size:14px;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;border:none;transition:transform .12s ease,opacity .12s ease;font-family:inherit;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-dark);}
+.btn-secondary{background:transparent;color:var(--accent-dark);border:1.5px solid var(--accent);}
+.btn-secondary:hover{background:var(--accent-soft);}
+.btn-full{width:100%;}
+.btn-small{padding:10px 18px;font-size:14px;}
+.btn:disabled{opacity:.6;cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--accent-dark);outline-offset:2px;}
+
+.facts{padding:8px 0 48px;}
+.facts-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.fact{background:var(--surface);padding:18px 16px;display:flex;flex-direction:column;gap:4px;}
+.fact-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.fact-value{font-size:15px;font-weight:600;color:var(--ink);}
+
+.cta-strip{background:var(--accent-soft);padding:20px 0;}
+.cta-strip-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.cta-strip-inner p{margin:0;color:var(--accent-dark);font-weight:500;font-size:14px;}
+
+.register{padding:56px 0 64px;}
+.register h2{font-size:24px;}
+.register-sub{color:var(--muted);margin-bottom:28px;}
+
+/* Urgent Timer Styling */
+.urgent-banner {
+  background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+  border: 2px solid #C4C8C5; 
+  color: #343A40; 
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(196, 200, 197, 0.3);
+}
+.urgent-banner strong {
+  color: #212529; 
+  font-weight: 700;
+  font-size: 15px;
+}
+.urgent-banner span.time {
+  font-family: 'Sora', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: #343A40; 
+  color: #FF3B30; 
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #C4C8C5; 
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+form{display:flex;flex-direction:column;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);}
+form label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500;color:var(--ink);}
+form input, form select {padding:12px 14px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;color:var(--ink);background:var(--bg);}
+form input:focus, form select:focus {outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+.form-error{color:#B3261E;font-size:14px;margin:0;}
+.form-note{font-size:13px;color:var(--muted);margin:4px 0 0;text-align:center;}
+
+.success{background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);padding:28px;text-align:center;}
+.success h3{color:var(--accent-dark);}
+.success-id{font-size:13px;color:var(--muted);}
+
+/* ── Sign-in ──────────────────────────────────────────────────────────── */
+.auth-gate{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);}
+
+.footer{border-top:1px solid var(--border);padding:28px 0 90px;}
+.footer p{margin:0 0 6px;font-size:13px;color:var(--muted);}
+.footer a{color:var(--accent-dark);}
+
+.footer-logo{height:50px;width:auto;object-fit:contain;display:block;margin-bottom:20px;}
+
+.mobile-bar{position:fixed;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border-top:1px solid var(--border);padding:12px 18px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -2px 8px rgba(20,32,28,0.06);z-index:50;}
+.mobile-bar span{font-size:13px;font-weight:600;color:var(--ink);}
+
+@media (max-width:640px){
+  .hero h1{font-size:28px;}
+  .facts-grid{grid-template-columns:repeat(2,1fr);}
+  .mobile-bar{display:flex;}
+  .footer{padding-bottom:100px;}
+  .urgent-banner { flex-direction: column; text-align: center; gap: 10px; }
+}
+@media (prefers-reduced-motion:reduce){
+  .btn{transition:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <span class="brand">CIMinds</span>
+    <img src="logo.png" alt="CIMinds Logo" class="brand-logo">
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Registrations open</p>
+    <h1 class="js-course-name">AI Power User</h1>
+    <p class="hero-sub">Reserve your seat now. Seats are confirmed on a first-paid, first-served basis.</p>
+    <div class="price-row">
+      <span class="price-now">&#8377;<span class="js-amount-num">7</span></span>
+      <span class="price-label">to reserve your seat</span>
+    </div>
+    <a href="#register" class="btn btn-primary">Register &amp; reserve my seat</a>
+  </div>
+</section>
+
+<section class="facts">
+  <div class="wrap facts-grid">
+    <div class="fact"><span class="fact-label">Mode</span><span class="fact-value">Live online</span></div>
+    <div class="fact"><span class="fact-label">Duration</span><span class="fact-value">8 weeks</span></div>
+    <div class="fact"><span class="fact-label">Certificate</span><span class="fact-value">On completion</span></div>
+    <div class="fact"><span class="fact-label">Seats</span><span class="fact-value">Limited</span></div>
+  </div>
+</section>
+
+<section class="cta-strip">
+  <div class="wrap cta-strip-inner">
+    <p>Your seat is held only after registration and payment.</p>
+    <a href="#register" class="btn btn-secondary">Reserve my seat</a>
+  </div>
+</section>
+
+<section class="register" id="register">
+  <div class="wrap">
+    <h2>Complete your registration</h2>
+    <p class="register-sub">Sign in with Google to reserve your seat. Your seat is confirmed the moment your payment goes through.</p>
+
+    <!-- Always visible immediately — no loading screen blocking this -->
+    <div class="auth-gate" id="authGate">
+      <button type="button" class="btn btn-primary btn-full" id="googleSignInBtn">Continue with Google</button>
+      <p class="form-error" id="gateError" hidden style="margin-top:10px;"></p>
+    </div>
+
+    <div class="form-note" id="connectedBanner" hidden style="text-align:left;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 16px;color:var(--accent-dark);font-weight:500;margin-bottom:6px;">
+      ✓ Connected as <span id="connectedEmail"></span>
+    </div>
+
+    <div class="urgent-banner" id="urgentBanner" hidden>
+      <span>✨ <strong>Hurry up!</strong> We're holding this special price for you. Complete your registration before time runs out!</span>
+      <span class="time" id="countdownTimer">03:00</span>
+    </div>
+
+    <form id="regForm" novalidate hidden>
+      <label>Full name
+        <input type="text" id="name" autocomplete="name" required>
+      </label>
+      <label>Email address
+        <input type="email" id="email" autocomplete="email" required>
+      </label>
+      <label>Phone number
+        <input type="tel" id="phone" autocomplete="tel" inputmode="numeric" maxlength="10" required>
+      </label>
+      
+      <label>Occupation
+        <select id="occupation" required>
+          <option value="" disabled selected>Select your occupation</option>
+          <option value="student">Student</option>
+          <option value="professional">Working Professional</option>
+          <option value="freelancer">Freelancer</option>
+          <option value="business">Business Owner</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <p class="form-error" id="formError" hidden></p>
+      <button type="submit" class="btn btn-primary btn-full" id="payBtn">Register &amp; pay &#8377;<span class="js-amount-num">7</span> to reserve seat</button>
+      <p class="form-note">Secured by Razorpay. This amount reserves your seat — the remaining course fee and next steps are shared with you after registration.</p>
+    </form>
+
+    <div class="success" id="successBox" hidden>
+      <h3>Seat reserved</h3>
+      <p>Thank you — your seat is confirmed. A receipt has been sent to your email.</p>
+      <p class="success-id">Payment ID: <span id="paymentIdText"></span></p>
+      <p class="success-id" style="margin-top:10px;">Taking you to the course page…</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <img src="logo.png" alt="CIMinds Logo" class="footer-logo">
+    <p>&copy; <span id="year"></span> CIMinds. All rights reserved.</p>
+    <p>Questions? Reach us at <a href="mailto:support@ciminds.in?subject=Inquiry:%20AI%20Power%20User%20Course">support@ciminds.in</a></p>
+  </div>
+</footer>
+
+<div class="mobile-bar" id="mobileBar">
+  <span>&#8377;<span class="js-amount-num">7</span> to reserve seat</span>
+  <a href="#register" class="btn btn-primary btn-small">Register</a>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+<script type="module">
+  import {
+    onAuthChange, signInWithGoogleRedirect, getGoogleRedirectResult, checkRegistration, saveRegistration
+  } from './firebase-config.js';
+
+  // ============================================================
+  // CONFIGURATION
+  // ============================================================
+  const CONFIG = {
+    courseName: "AI Power User",
+    seatAmount: 7,
+    razorpayKeyId: "rzp_test_XXXXXXXXXXXX",
+    companyName: "CIMinds",
+  };
+
+  document.querySelectorAll('.js-course-name').forEach(function(el){ el.textContent = CONFIG.courseName; });
+  document.querySelectorAll('.js-amount-num').forEach(function(el){ el.textContent = CONFIG.seatAmount; });
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ============================================================
+  // ELEMENTS
+  // ============================================================
+  const authGate      = document.getElementById('authGate');
+  const googleSignInBtn = document.getElementById('googleSignInBtn');
+  const gateError     = document.getElementById('gateError');
+  const connectedBanner = document.getElementById('connectedBanner');
+  const connectedEmail  = document.getElementById('connectedEmail');
+  const urgentBanner  = document.getElementById('urgentBanner');
+  const form          = document.getElementById('regForm');
+  const payBtn        = document.getElementById('payBtn');
+  const formError     = document.getElementById('formError');
+  const payBtnDefaultText = payBtn.innerHTML;
+
+  let currentUser = null;
+  let timerInterval = null;
+
+  function showError(msg){
+    formError.textContent = msg;
+    formError.hidden = false;
+  }
+  function showGateError(msg){
+    gateError.textContent = msg;
+    gateError.hidden = false;
+  }
+  function resetPayBtn(){
+    payBtn.disabled = false;
+    payBtn.innerHTML = payBtnDefaultText;
+  }
+
+  // ============================================================
+  // URGENCY TIMER — starts once the payment form is shown
+  // ============================================================
+  function startUrgencyTimer(){
+    if (timerInterval) return;
+    let timeLeft = 180;
+    const timerEl = document.getElementById('countdownTimer');
+    timerInterval = setInterval(function() {
+      timeLeft--;
+      let m = Math.floor(timeLeft / 60);
+      let s = timeLeft % 60;
+      m = m < 10 ? '0' + m : m;
+      s = s < 10 ? '0' + s : s;
+      timerEl.textContent = m + ":" + s;
+      if(timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerEl.textContent = "00:00";
+      }
+    }, 1000);
+  }
+
+  // ============================================================
+  // GOOGLE SIGN-IN — full-page redirect, not a popup. The page will
+  // navigate away to Google and come straight back once signed in;
+  // getGoogleRedirectResult() below picks up the result on that return.
+  // ============================================================
+  googleSignInBtn.addEventListener('click', function(){
+    gateError.hidden = true;
+    googleSignInBtn.disabled = true;
+    googleSignInBtn.textContent = 'Taking you to Google…';
+    // The click happens on THIS page load, but the result is only known
+    // after the browser navigates to Google and back — a brand new page
+    // load with none of this page's JS state intact. sessionStorage
+    // survives that round trip, so it's how we tell "came back from a
+    // redirect attempt" apart from "this is just a normal first visit"
+    // once we're back.
+    sessionStorage.setItem('ciminds_google_redirect_pending', '1');
+    signInWithGoogleRedirect();
+    // No code runs after this — the browser navigates away immediately.
+  });
+
+  // ============================================================
+  // Pick up the result of a Google redirect sign-in, if this page load is
+  // the browser coming back from one.
+  //
+  // IMPORTANT: getRedirectResult() is NOT a reliable failure signal on its
+  // own. Firebase's onAuthChange listener can settle with the real signed-
+  // in user slightly before or after getRedirectResult() resolves, and on
+  // some networks/browsers getRedirectResult() comes back null even though
+  // the sign-in genuinely succeeded (onAuthChange already has the user).
+  // So: onAuthChange is the source of truth for "are we signed in or not".
+  // We only show an error here if, after a short grace period, the user
+  // is STILL not signed in — i.e. it wasn't just a timing race.
+  // ============================================================
+  const wasRedirectPending = sessionStorage.getItem('ciminds_google_redirect_pending') === '1';
+  sessionStorage.removeItem('ciminds_google_redirect_pending');
+
+  getGoogleRedirectResult().catch(function(err){
+    console.warn('[CI Minds] getGoogleRedirectResult rejected:', err);
+  }).then(function(){
+    if (!wasRedirectPending) return;
+    // Give onAuthChange a moment to settle before concluding it failed —
+    // avoids the race described above.
+    setTimeout(function(){
+      if (!currentUser) {
+        googleSignInBtn.disabled = false;
+        googleSignInBtn.textContent = 'Continue with Google';
+        const diag = window.__ciMindsLastAuthError;
+        showGateError('Sign-in didn’t go through. Please try again.' + (diag && diag.code ? ' (' + diag.code + ')' : ''));
+      }
+    }, 1500);
+  });
+
+  // ============================================================
+  // AUTH STATE — once signed in, show the form immediately.
+  // The "already registered?" check runs quietly in the background and
+  // only redirects away if it finds a match — it never blocks the form
+  // from showing, so there's nothing for the visitor to wait on.
+  // ============================================================
+  onAuthChange(function(user){
+    if (!user) {
+      authGate.hidden = false;
+      connectedBanner.hidden = true;
+      urgentBanner.hidden = true;
+      form.hidden = true;
+      googleSignInBtn.disabled = false;
+      googleSignInBtn.textContent = 'Continue with Google';
+      return;
+    }
+
+    currentUser = user;
+    authGate.hidden = true;
+    connectedBanner.hidden = false;
+    connectedEmail.textContent = user.email || user.displayName || 'your Google account';
+    urgentBanner.hidden = false;
+    form.hidden = false;
+    if (user.email) document.getElementById('email').value = user.email;
+    if (user.displayName) document.getElementById('name').value = user.displayName;
+    startUrgencyTimer();
+
+    // Quiet background check — redirects only if already registered.
+    checkRegistration(user.uid).then(function(existing){
+      if (existing) window.location.href = 'course.html';
+    });
+  });
+
+  // ============================================================
+  // FORM & PAYMENT LOGIC
+  // ============================================================
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    formError.hidden = true;
+
+    if (!currentUser) return showError('Please sign in first.');
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const occupation = document.getElementById('occupation').value;
+
+    if (!name) return showError('Please enter your full name.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('Please enter a valid email address.');
+    if (!/^[0-9]{10}$/.test(phone)) return showError('Please enter a valid 10-digit phone number.');
+    if (!occupation) return showError('Please select your occupation.');
+
+    payBtn.disabled = true;
+    payBtn.textContent = 'Opening payment…';
+
+    const options = {
+      key: CONFIG.razorpayKeyId,
+      amount: CONFIG.seatAmount * 100, 
+      currency: 'INR',
+      name: CONFIG.companyName,
+      description: CONFIG.courseName + ' — seat booking',
+      prefill: { name: name, email: email, contact: phone },
+      notes: { occupation: occupation }, 
+      theme: { color: '#0B6B57' },
+      handler: async function(response){
+        form.hidden = true;
+        urgentBanner.hidden = true; 
+        document.getElementById('successBox').hidden = false;
+        document.getElementById('paymentIdText').textContent = response.razorpay_payment_id;
+        if (timerInterval) clearInterval(timerInterval);
+
+        // Write the registration record. This is what stops the same
+        // person from registering twice and is fully separate from course
+        // enrollment — course.html/dashboard.html never see this collection.
+        await saveRegistration(currentUser.uid, {
+          name: name,
+          email: email,
+          phone: phone,
+          occupation: occupation,
+          paymentId: response.razorpay_payment_id,
+          amount: CONFIG.seatAmount
+        });
+
+        setTimeout(function(){
+          window.location.href = 'course.html';
+        }, 2500);
+      },
+      modal: {
+        ondismiss: function(){ resetPayBtn(); }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(){
+      resetPayBtn();
+      showError('Payment didn’t go through. Please try again.');
+    });
+    rzp.open();
+  });
+</script>
+
+</body>
+</html>
