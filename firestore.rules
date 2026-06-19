@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // users/{userId} — profile, enrollment status, and course progress.
+    // Only the signed-in owner of this document can read or write it.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // users/{userId}/payments/{paymentId} — one record per successful
+      // Razorpay payment. Immutable once written: the owner can read and
+      // create their own payment records, but never edit or delete them.
+      match /payments/{paymentId} {
+        allow read, create: if request.auth != null && request.auth.uid == userId;
+        allow update, delete: if false;
+      }
+    }
+    // registrations/{userId} — the ₹7 seat-reservation record from register.html.
+    // Fully separate from "users" (enrollment data) on purpose: registering
+    // never enrolls anyone in the course. The owner can create their own
+    // registration once and read it back (to power the "already registered"
+    // check), but can never edit or delete it — this is what makes the
+    // duplicate-registration check tamper-proof even if someone messes with
+    // the page's JavaScript directly.
+    match /registrations/{userId} {
+      allow read, create: if request.auth != null && request.auth.uid == userId;
+      allow update, delete: if false;
+    }
+  }
+}
