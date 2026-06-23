@@ -1,0 +1,61 @@
+rules_version = '2';
+// ─────────────────────────────────────────────────────────────────────────────
+// CI Minds — Firestore Security Rules (hardened with rate-limit enforcement)
+// Replace your existing firestore.rules with this file.
+//
+// Changes vs the original:
+//   1. registrations/{userId} now uses !exists(...) — the server itself
+//      enforces that each user can only create ONE registration document,
+//      ever. No amount of JavaScript manipulation on the client can bypass
+//      this. This is the server-side equivalent of the 'register-submit'
+//      rate limit.
+//   2. A catch-all deny rule at the bottom blocks scrapers and bots that
+//      probe unknown collection paths.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── users/{userId} ──────────────────────────────────────────────────────
+    // Profile, enrollment status, course progress, session ID.
+    // Only the signed-in owner of this document can read or write it.
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+
+      // users/{userId}/payments/{paymentId}
+      // Immutable once written — the owner can create and read their own
+      // payment records but can never edit or delete them.
+      match /payments/{paymentId} {
+        allow read, create: if request.auth != null
+                            && request.auth.uid == userId;
+        allow update, delete: if false;
+      }
+    }
+
+    // ── registrations/{userId} ──────────────────────────────────────────────
+    // The ₹7 seat-reservation record from register.html.
+    // Fully separate from "users" (enrollment data) on purpose.
+    //
+    // SERVER-SIDE RATE LIMIT:
+    //   The !exists(...) guard means Firestore will reject any create attempt
+    //   if a document for this user already exists. Combined with the
+    //   allow update: if false rule this makes double-registration physically
+    //   impossible — even if someone bypasses all client-side checks.
+    match /registrations/{userId} {
+      allow read, create: if request.auth != null
+                          && request.auth.uid == userId
+                          && !exists(/databases/$(database)/documents/registrations/$(userId));
+      allow update, delete: if false;
+    }
+
+    // ── Catch-all deny ───────────────────────────────────────────────────────
+    // Block every other collection path. This stops:
+    //   • Scrapers probing collections your app doesn't use.
+    //   • Bots brute-forcing Firestore document paths.
+    //   • Accidental data exposure if a new collection is added without rules.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
