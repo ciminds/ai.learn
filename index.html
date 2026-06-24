@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI Minds — AI Fundamentals, No Math No Coding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --page-bg:#F1F1F1;
+  --bg:#1A1A1A;
+  --card-dark:#161616;
+  --orange:#F5C518;
+  --orange-hover:#E0B000;
+  --white:#FFFFFF;
+  --ink:#101113;
+  --muted:#8A8A8A;
+  --muted-label:#979797;
+  --muted-on-dark:rgba(255,255,255,0.80);
+  --divider:#EDEDED;
+  --divider-dark:rgba(255,255,255,0.08);
+  --header-h:84px;
+  --header-h-mobile:68px;
+  --radius-card:26px;
+  --gap:16px;
+  --maxw:1280px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:var(--header-h);overflow-x:hidden;scroll-snap-type:y proximity;}
+body{
+  overflow-x:hidden;
+  font-family:'Inter',sans-serif;
+  color:var(--ink);
+  background-color:var(--page-bg);
+  position:relative;
+  -webkit-font-smoothing:antialiased;
+}
+.bg-layer{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(16,17,19,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,17,19,0.08) 1px, transparent 1px);
+  background-size:48px 48px, 48px 48px;
+  background-position:0 0, 0 0;
+  will-change:transform;
+}
+@media(prefers-reduced-motion: reduce){
+  .bg-layer{transition:none;}
+}
+a{color:inherit;text-decoration:none;}
+button,input,select,textarea{font-family:'Inter',sans-serif;}
+h1,h2,h3,h4{font-family:'Inter',sans-serif;}
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px;}
+img{max-width:100%;display:block;}
+ul{list-style:none;}
+
+/* ========== HEADER ========== */
+header{position:sticky;top:0;z-index:200;background:transparent;display:flex;flex-direction:column;padding:0 12px;}
+.header-shell{position:relative;background:var(--bg);transition:box-shadow .3s ease, border-radius .3s ease, transform .3s cubic-bezier(.21,.85,.35,1);max-width:var(--maxw);margin:0 auto;width:100%;border-radius:0 0 28px 28px;overflow:hidden;}
+header.is-scrolled .header-shell{box-shadow:0 14px 36px rgba(0,0,0,0.45);border-radius:0 0 28px 28px;}
+.header-inner{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 16px;height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+@media(min-width:600px){
+  header{padding:0 20px;}
+  .header-inner{padding:0 24px;height:var(--header-h);}
+}
+.logo-link{display:flex;align-items:center;flex:none;}
+.logo-img{
+  height:30px;
+  width:auto;
+  display:block;
+}
+@media(min-width:600px){
+  .logo-img{height:38px;}
+}
+.logo-text{font-family:'Inter',sans-serif;font-weight:700;font-size:22px;color:var(--white);letter-spacing:-0.3px;}
+.logo-text span{color:var(--orange);}
+.header-inner .logo-text span{position:relative;}
+.header-inner .logo-text span::after{
+  content:'';
+  position:absolute;left:0;bottom:-3px;
+  width:100%;height:2px;
+  background:var(--orange);
+  transform:scaleX(0);
+  transform-origin:left;
+  animation:logo-underline .7s .5s cubic-bezier(.21,.85,.35,1) forwards;
+}
+@keyframes logo-underline{to{transform:scaleX(1);}}
+@media (prefers-reduced-motion: reduce){
+  .header-inner .logo-text span::after{animation:none;transform:scaleX(1);}
+}
+nav.main-nav{display:flex;align-items:center;gap:28px;}
+nav.main-nav a{font-size:12.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,0.85);white-space:nowrap;transition:color .15s;}
+nav.main-nav a:hover{color:var(--white);}
+.header-right{display:flex;align-items:center;gap:12px;flex:none;}
+.header-btn{background:var(--white);color:var(--ink);font-weight:600;font-size:13.5px;padding:11px 22px;border-radius:12px;border:none;cursor:pointer;white-space:nowrap;}
+.header-btn.register{background:var(--orange);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px;flex:none;}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--white);margin:4px 0;border-radius:2px;transition:transform .2s ease, opacity .2s ease;}
+.nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0;}
+.nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.mobile-nav{display:none;flex-direction:column;background:var(--bg);border-top:1px solid rgba(255,255,255,0.08);}
+.mobile-nav.open{display:flex;}
+.mobile-nav a{padding:14px 24px;font-size:14px;font-weight:500;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.06);}
+.mobile-nav .mobile-nav-ctas{display:flex;gap:10px;padding:16px 24px 20px;}
+.mobile-nav .mobile-nav-ctas .header-btn{flex:1;text-align:center;justify-content:center;}
+@media(max-width:879px){
+  nav.main-nav{display:none;}
+  .nav-toggle{display:block;}
+  .header-right .header-btn{display:none;}
+}
+/* Small-laptop / landscape-tablet pinch zone: full nav + both buttons need
+   tighter spacing here or "My Account" clips off the right edge. */
+@media(min-width:880px) and (max-width:1099px){
+  .header-inner{padding:0 16px;gap:10px;}
+  nav.main-nav{gap:16px;}
+  nav.main-nav a{font-size:13px;}
+  .header-right{gap:8px;}
+  .header-btn{padding:10px 16px;font-size:13px;}
+}
+@media(min-width:880px){
+  .mobile-nav-ctas{display:none;}
+}
+
+/* ========== BENTO GRID SHELL ========== */
+.bento-wrap{max-width:var(--maxw);margin:0 auto;padding:20px 16px 20px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;}
+.bento-row{display:grid;grid-template-columns:1fr;gap:12px;scroll-snap-align:start;scroll-margin-top:calc(var(--header-h-mobile) + 12px);}
+@media(min-width:600px){
+  .bento-row{scroll-margin-top:calc(var(--header-h) + 16px);}
+}
+@media(min-width:600px){
+  .bento-wrap{padding:24px 20px 24px;gap:var(--gap);}
+  .bento-row{gap:var(--gap);}
+}
+/* Mobile: hero section takes up the exact first screen — no overflow into next card */
+@media(max-width:599px){
+  .bento-wrap{
+    padding-top:20px;
+    gap:12px;
+  }
+  /* Ensure the hero bcard itself does not grow beyond one screen */
+  .bento-wrap > .hero-card{
+    flex-shrink:0;
+  }
+}
+
+/* shared card look */
+.bcard{
+  background:var(--card-dark);
+  border:1px solid var(--divider-dark);
+  border-radius:22px;
+  padding:24px 20px;
+  position:relative;
+  overflow:hidden;
+}
+@media(min-width:600px){
+  .bcard{border-radius:var(--radius-card);padding:32px;}
+}
+.bcard.light{background:var(--white);border:1px solid var(--divider);}
+.bcard .eyebrow{font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:rgba(255,255,255,0.60);margin-bottom:14px;}
+.bcard.light .eyebrow{color:rgba(16,17,19,0.45);font-size:11px;font-weight:700;letter-spacing:.10em;}
+#workshops.bcard .eyebrow{color:#071A1F;text-align:center;font-size:18px;font-weight:700;}
+
+/* ========== ROW 1: HERO (full width, fills first screen) ========== */
+.hero-card{
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  min-height:calc(100svh - var(--header-h-mobile) - 20px - 12px);
+  scroll-snap-align:start;
+  scroll-margin-top:calc(var(--header-h-mobile) + 12px);
+}
+/* Mobile: hero card must fill exactly the full first screen — nothing else visible */
+@media(max-width:599px){
+  .hero-card{
+    min-height:calc(100svh - var(--header-h-mobile) - 20px - 12px);
+    height:calc(100svh - var(--header-h-mobile) - 20px - 12px);
+    max-height:calc(100svh - var(--header-h-mobile) - 20px - 12px);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+}
+/* Hero two-column layout */
+.hero-inner{padding:16px 20px 16px;flex:1;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:32px;overflow:hidden;}
+.hero-left{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+.hero-right-panel{
+  flex:none;
+  width:196px;
+  margin-right:clamp(24px,6vw,80px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+/* Minimal monochrome Register Now — clean, big-tech */
+.btn-register-hero{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  padding:15px 22px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.18);
+  cursor:pointer;
+  text-decoration:none;
+  font-size:13.5px;
+  font-weight:700;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:#ffffff;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  overflow:hidden;
+  transition:background .2s ease,border-color .2s ease,transform .18s cubic-bezier(.4,0,.2,1),box-shadow .2s ease;
+  box-shadow:0 1px 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+  white-space:nowrap;
+}
+/* Shimmer sweep on hover */
+.btn-register-hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,0.13) 50%,transparent 62%);
+  background-size:220% 100%;
+  background-position:220% 0;
+  transition:background-position .52s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.btn-register-hero .rn-arrow{
+  display:inline-flex;
+  align-items:center;
+  transition:transform .2s cubic-bezier(.4,0,.2,1);
+}
+.btn-register-hero:hover{
+  background:rgba(255,255,255,0.14);
+  border-color:rgba(255,255,255,0.32);
+  transform:translateY(-2px);
+  box-shadow:0 4px 16px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.btn-register-hero:hover::before{background-position:-20% 0;}
+.btn-register-hero:hover .rn-arrow{transform:translateX(4px);}
+.btn-register-hero:active{
+  transform:translateY(0);
+  background:rgba(255,255,255,0.06);
+  transition-duration:.06s;
+}
+/* Seat note */
+.hero-seat-note{
+  font-size:11.5px;
+  font-weight:500;
+  color:var(--orange);
+  text-align:center;
+  letter-spacing:0.03em;
+  line-height:1.5;
+}
+/* Mobile: hide right panel, tighten padding, bigger fonts */
+@media(max-width:767px){
+  .hero-inner{flex-direction:column;align-items:flex-start;gap:12px;padding:12px 20px 12px;}
+  .hero-right-panel{display:none;}
+  .hero-left{width:100%;}
+}
+@media(max-width:599px){
+  .hero-inner{
+    padding:10px 18px 10px;
+    flex:1;
+    overflow:hidden;
+  }
+  .hero-inner h1{font-size:clamp(26px,9vw,38px);}
+  .hero-desc{font-size:14px;margin-top:8px;}
+  .hero-meta{font-size:12.5px;margin-top:8px;}
+  .hero-eyebrow{padding:10px 18px;font-size:12px;flex-shrink:0;}
+}
+@media(min-width:600px){
+  .hero-card{scroll-margin-top:calc(var(--header-h) + 16px);}
+}
+.hero-eyebrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;font-weight:500;color:var(--muted-on-dark);padding:12px 20px;border-bottom:1px solid var(--divider-dark);flex:none;}
+.hero-eyebrow .sep{opacity:.6;}
+.hero-eyebrow .current{color:var(--white);font-weight:600;}
+
+.hero-inner h1{font-size:clamp(30px,9vw,64px);line-height:1.04;font-weight:500;letter-spacing:-0.02em;color:var(--white);max-width:680px;}
+.hero-inner h1 .accent{color:var(--orange);}
+.hero-inner h1 .accent-sky{color:#38BDF8;}
+.hero-inner h1[data-typewriter]{display:inline-block;}
+.hero-inner h1 .tw-char{
+  display:inline;
+  opacity:0;
+  animation:typewriter-char-in .01s linear forwards;
+  animation-delay:var(--tdelay,0s);
+}
+.hero-inner h1 .tw-cursor{
+  display:inline-block;
+  width:3px;
+  height:0.85em;
+  margin-left:4px;
+  background:var(--orange);
+  vertical-align:text-bottom;
+  opacity:0;
+  animation:typewriter-blink .8s step-end 8;
+  animation-delay:var(--tcursor-delay,1.5s);
+}
+@keyframes typewriter-char-in{
+  to{opacity:1;}
+}
+@keyframes typewriter-blink{
+  0%,100%{opacity:1;}
+  50%{opacity:0;}
+}
+@keyframes typewriter-blink{
+  0%,100%{opacity:1;}
+  50%{opacity:0;}
+}
+@media(max-width:600px){
+  .hero-inner h1 .tw-char{animation:none;opacity:1;}
+  .hero-inner h1 .tw-cursor{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-inner h1 .tw-char{animation:none;opacity:1;}
+  .hero-inner h1 .tw-cursor{animation:none;opacity:0;}
+}
+.hero-desc{margin-top:12px;font-size:14px;line-height:1.5;color:var(--muted-on-dark);max-width:440px;}
+.hero-meta{margin-top:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted-on-dark);}
+.hero-meta .stars{color:var(--orange);letter-spacing:1px;font-size:12px;}
+.hero-meta strong{color:var(--white);font-weight:600;}
+.hero-meta .dot{opacity:.5;}
+.hero-cta-row{margin-top:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.btn-register{position:relative;display:inline-flex;align-items:center;gap:10px;background:var(--orange);border:none;color:var(--ink);font-size:14px;font-weight:600;padding:13px 22px;border-radius:14px;cursor:pointer;transition:padding .2s cubic-bezier(.4,0,.2,1), gap .2s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.btn-register:hover{padding-right:28px;gap:14px;}
+.btn-register .arrow{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .2s cubic-bezier(.4,0,.2,1);}
+.btn-register .arrow svg{width:16px;height:16px;}
+.btn-register:hover .arrow{transform:translateX(2px);}
+.hero-cta-row .small-note{font-size:12.5px;font-weight:600;color:var(--orange);}
+@media(min-width:600px){
+  .hero-card{min-height:calc(100svh - var(--header-h) - 24px - 16px);}
+  .hero-eyebrow{padding:14px 32px;}
+  .hero-inner{padding:16px 32px 16px;}
+  .hero-desc{margin-top:14px;font-size:15px;}
+  .hero-meta{margin-top:16px;}
+  .hero-cta-row{margin-top:22px;}
+}
+
+/* ========== ROW 2: WHY (stacked 2) + WORKSHOPS (tall) ========== */
+.row-two{grid-template-columns:1fr;}
+.col-stack{display:flex;flex-direction:column;gap:var(--gap);}
+.why-card{
+  background:var(--card-dark);
+  border:1px solid rgba(0,180,160,0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 18px 44px rgba(0,0,0,0.6);
+}
+.why-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(135deg, rgba(0,200,180,0.04) 0%, rgba(255,255,255,0) 22%);
+}
+.why-card h2{font-size:clamp(22px,3.2vw,28px);font-weight:500;letter-spacing:-0.02em;color:var(--white);line-height:1.15;}
+.why-lead{margin-top:12px;font-size:14.5px;line-height:1.65;color:rgba(255,255,255,0.82);}
+.why-checks{margin-top:20px;display:flex;flex-direction:column;gap:10px;}
+.why-checks li{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,0.92);}
+.why-checks svg{width:15px;height:15px;flex-shrink:0;color:var(--orange);}
+.stat-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:16px;background:var(--card-dark) !important;border-color:rgba(0,180,160,0.15) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 44px rgba(0,0,0,0.6);}
+.stat-card .eyebrow{color:rgba(255,255,255,0.60) !important;}
+.stat-card .stat-label{color:var(--white) !important;font-weight:500;}
+.stat-card .icon-slot-mark{color:rgba(255,255,255,0.3) !important;border-color:rgba(255,255,255,0.2) !important;}
+.trust-link{color:var(--orange) !important;}
+.trust-link{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--orange);}
+.trust-link span{transition:transform .15s;}
+.trust-link:hover span{transform:translateX(3px);}
+.stat-card .big-num{font-family:'Inter',sans-serif;font-size:clamp(32px,5vw,44px);font-weight:700;color:var(--orange);letter-spacing:-1px;}
+.stat-card .stat-label{font-size:13px;color:var(--muted-on-dark);max-width:160px;line-height:1.4;}
+.ws-card{display:flex;flex-direction:column;}
+#workshops.bcard{border:none;border-radius:0;background:transparent;padding:32px 0;}
+@media(min-width:600px){#workshops.bcard{padding:48px 0;}}
+.ws-card h3{font-family:'Inter',sans-serif;font-size:clamp(36px,6vw,56px);font-weight:500;letter-spacing:-0.02em;color:var(--learn-navy);margin-bottom:40px;text-align:center;}
+.bcard.light.ws-card{--learn-navy:#0d2a2e;}
+.learn-item{display:grid;grid-template-columns:1fr;gap:16px;align-items:center;}
+.learn-item + .learn-item{margin-top:32px;padding-top:32px;border-top:1px solid var(--divider);}
+.learn-art{
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  aspect-ratio:3/2;
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
+  background:#111;
+  border:1px solid rgba(255,255,255,0.07);
+  transform:translateY(10px);
+  opacity:0;
+  transition:transform .65s cubic-bezier(.21,.85,.35,1), opacity .65s ease;
+}
+.learn-art.kinetic-ready{
+  transform:translateY(0);
+  opacity:1;
+}
+.learn-art img{width:100%;height:100%;object-fit:cover;display:block;}
+.learn-art .art-placeholder-label{
+  text-align:center;
+  padding:16px;
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.65);
+  line-height:1.6;
+  max-width:280px;
+}
+.learn-art .art-placeholder-label .art-tag{
+  display:block;
+  font-size:13.5px;
+  font-weight:700;
+  letter-spacing:0;
+  text-transform:none;
+  color:#7EDCDC;
+  margin-bottom:6px;
+}
+/* learn-art animation handled above */
+@media (prefers-reduced-motion: reduce){.learn-art{transition:none;transform:none;opacity:1;}}
+.learn-text strong{display:block;font-family:'Inter',sans-serif;font-size:17px;font-weight:600;letter-spacing:-0.2px;color:var(--learn-navy);margin-bottom:8px;}
+.learn-text p{font-size:13.5px;line-height:1.65;color:var(--muted);opacity:1;max-width:480px;}
+.learn-text .mini-cta{
+  display:inline-flex;align-items:center;
+  margin-top:14px;
+  background:#000;
+  color:#fff;
+  border:1px solid #000;
+  font-family:'Inter',sans-serif;
+  font-size:11.5px;
+  font-weight:600;
+  padding:8px 16px;
+  border-radius:7px;
+  text-decoration:none;
+  transition:background .15s,color .15s;
+}
+.learn-text .mini-cta:hover{background:#222;color:#fff;text-decoration:none;}
+@media(min-width:600px){
+  .learn-item{grid-template-columns:1.15fr 1fr;gap:40px;}
+}
+.benefits-list{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;flex:1;}
+.benefit-item{display:flex;align-items:flex-start;gap:11px;}
+.check-icon{color:var(--orange);flex-shrink:0;width:16px;height:16px;margin-top:3px;}
+.benefit-item .text-block strong{display:block;font-size:13.5px;font-weight:600;color:var(--white);margin-bottom:3px;}
+.benefit-item .text-block p{font-size:12.5px;line-height:1.55;color:var(--muted-on-dark);}
+.mini-cta{display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:var(--orange);}
+.mini-cta:hover{text-decoration:underline;}
+.register-btn{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:var(--ink);border:none;border-radius:14px;padding:13px 26px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;align-self:flex-start;}
+.register-btn:hover{opacity:.85;}
+
+/* ========== ROW 3: ABOUT (wide) + CTA (narrow) ========== */
+.row-three{grid-template-columns:1fr;}
+.row-cta-solo{grid-template-columns:1fr;}
+.row-problem{grid-template-columns:1fr;}
+.problem-card h3,.solution-card h3{font-size:clamp(19px,2.6vw,23px);font-weight:500;letter-spacing:-0.02em;color:var(--white);margin-bottom:10px;}
+.problem-card p,.solution-card p{font-size:13.5px;line-height:1.6;color:var(--muted-on-dark);}
+.problem-card,.solution-card{background:var(--card-dark);}
+.solution-card{border:1px solid var(--orange);}
+.solution-card .register-btn{margin-top:18px;}
+.about-card h2{font-size:clamp(24px,3.6vw,32px);font-weight:500;letter-spacing:-0.02em;color:var(--ink);margin-bottom:16px;} .about-card h2 em{font-style:italic;font-weight:400;color:rgba(16,17,19,0.7);}
+.about-card p{font-size:14px;line-height:1.7;margin-bottom:16px;color:#4a4a4a;}
+.about-card h3{font-size:18px;font-weight:700;margin-top:18px;margin-bottom:10px;color:var(--ink);}
+.about-tagline{font-size:14px;color:var(--muted);margin-bottom:22px;}
+.learn-more-btn{background:var(--bg);color:var(--white);border:none;border-radius:14px;padding:12px 26px;font-size:14px;font-weight:600;cursor:pointer;}
+/* ========== BIG-TYPE CTA (giant stacked headline + rotated pill badges) ========== */
+.cta-card{
+  background:
+    radial-gradient(120% 140% at 15% 20%, rgba(255,229,140,0.9), transparent 55%),
+    radial-gradient(110% 130% at 85% 80%, rgba(224,176,0,0.55), transparent 60%),
+    linear-gradient(135deg, #FBD64A 0%, #F5C518 45%, #EFB400 100%);
+  border:1px solid rgba(255,255,255,0.35);
+  padding:0;
+  overflow:hidden;
+  min-height:340px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;
+}
+.cta-card::before{
+  content:'';
+  position:absolute;
+  top:-35%;right:-12%;
+  width:65%;height:150%;
+  background:radial-gradient(closest-side, rgba(255,255,255,0.45), rgba(255,255,255,0.1) 55%, transparent 75%);
+  filter:blur(46px);
+  pointer-events:none;
+  z-index:0;
+  animation:liquid-drift-a 16s ease-in-out infinite;
+}
+.cta-card::after{
+  content:'';
+  position:absolute;
+  bottom:-40%;left:-15%;
+  width:55%;height:130%;
+  background:radial-gradient(closest-side, rgba(255,255,255,0.3), rgba(255,255,255,0.05) 60%, transparent 75%);
+  filter:blur(50px);
+  pointer-events:none;
+  z-index:0;
+  animation:liquid-drift-b 20s ease-in-out infinite;
+}
+@keyframes liquid-drift-a{
+  0%,100%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(-4%,6%) scale(1.08);}
+}
+@keyframes liquid-drift-b{
+  0%,100%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(5%,-5%) scale(1.06);}
+}
+@media(prefers-reduced-motion: reduce){
+  .cta-card::before, .cta-card::after{animation:none;}
+}
+.cta-big, .cta-foot{position:relative;z-index:1;}
+.cta-big{
+  padding:36px 28px 26px;
+  position:relative;
+}
+.cta-big .big-line{
+  display:block;
+  font-family:'Inter',sans-serif;
+  font-weight:700;
+  font-style:normal;
+  transform:skewX(-6deg);
+  text-transform:uppercase;
+  color:var(--ink);
+  font-size:clamp(34px,7.4vw,92px);
+  line-height:0.88;
+  letter-spacing:-0.01em;
+  white-space:nowrap;
+}
+.cta-pill{
+  position:absolute;
+  display:inline-flex;align-items:center;
+  background:rgba(255,255,255,0.22);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  color:var(--ink);
+  border:1px solid rgba(255,255,255,0.55);
+  border-radius:999px;
+  padding:9px 22px;
+  font-family:'Inter',sans-serif;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  box-shadow:0 8px 24px rgba(16,17,19,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+  cursor:pointer;
+  transition:transform .15s ease, background .15s ease;
+}
+.cta-pill:hover{background:rgba(255,255,255,0.32);}
+.cta-pill:hover{transform:scale(1.04);}
+.cta-pill--a{top:6%;right:7%;transform:rotate(-6deg);}
+.cta-pill--a:hover{transform:rotate(-6deg) scale(1.04);}
+.cta-pill--b{top:46%;left:30%;transform:rotate(4deg);}
+.cta-pill--b:hover{transform:rotate(4deg) scale(1.04);}
+.cta-foot{
+  padding:18px 28px 30px;
+  border-top:1.5px solid rgba(16,17,19,0.15);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+}
+.cta-foot p{font-size:13.5px;color:rgba(16,17,19,0.75);margin:0;}
+.cta-foot .learn-more-btn{background:var(--ink);flex:none;}
+@media(max-width:600px){
+  .cta-big .big-line{font-size:clamp(30px,12vw,48px);}
+  .cta-pill{padding:6px 14px;font-size:10.5px;}
+  .cta-pill--a{top:0%;right:0%;}
+  .cta-pill--b{top:38%;left:16%;}
+}
+
+@media(min-width:700px){
+  .row-two{grid-template-columns:1fr;}
+  .col-stack{flex-direction:row;}
+  .col-stack > .bcard{flex:1;}
+  .row-problem{grid-template-columns:1fr 1fr;}
+  .stat-card{flex-direction:column;}
+}
+
+/* ========== MOBILE HERO CTA ========== */
+.hero-mobile-cta{
+  display:none; /* hidden by default; shown on mobile only */
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
+  width:100%;
+  margin-top:14px;
+  padding-bottom:4px;
+}
+.btn-register-mobile{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  padding:15px 22px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.18);
+  cursor:pointer;
+  text-decoration:none;
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:#ffffff;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+  transition:background .2s ease, border-color .2s ease, transform .18s cubic-bezier(.4,0,.2,1), box-shadow .2s ease;
+  white-space:nowrap;
+}
+.btn-register-mobile:hover{
+  background:rgba(255,255,255,0.14);
+  border-color:rgba(255,255,255,0.32);
+  transform:translateY(-2px);
+  box-shadow:0 4px 16px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.btn-register-mobile:active{transform:translateY(0);background:rgba(255,255,255,0.06);transition-duration:.06s;}
+.hero-mobile-seat-note{
+  font-size:11.5px;
+  font-weight:500;
+  color:var(--orange);
+  letter-spacing:0.03em;
+  line-height:1.5;
+  width:100%;
+  text-align:center;
+}
+@media(max-width:767px){
+  .hero-mobile-cta{display:flex;}
+}
+
+/* ========== DESKTOP: BIGGER REGISTER NOW BUTTON (original white glass design) ========== */
+@media(min-width:768px){
+  .btn-register-hero{
+    font-size:16px;
+    padding:18px 28px;
+    border-radius:14px;
+  }
+  .hero-right-panel{
+    width:220px;
+    gap:18px;
+  }
+  .hero-seat-note{
+    font-size:12.5px;
+  }
+}
+@media(min-width:1024px){
+  .btn-register-hero{
+    font-size:18px;
+    padding:20px 34px;
+    border-radius:16px;
+    letter-spacing:0.06em;
+  }
+  .hero-right-panel{width:240px;}
+}
+
+/* ========== FOOTER ========== */
+.site-footer{margin:0;padding:48px 20px 20px;background:var(--bg);color:var(--white);position:relative;z-index:1;}
+
+/* ========== STICKY CTA ========== */
+.sticky-cta{
+  position:fixed;right:20px;bottom:20px;z-index:300;
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--orange);color:var(--ink);
+  font-size:14px;font-weight:600;
+  padding:14px 20px;border-radius:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  opacity:0;pointer-events:none;
+  transform:translateY(10px);
+  transition:opacity .2s, transform .2s;
+}
+.sticky-cta.visible{opacity:1;pointer-events:auto;transform:translateY(0);}
+.sticky-cta .arrow{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex:none;}
+.sticky-cta .arrow svg{width:16px;height:16px;}
+@media(max-width:600px){
+  .sticky-cta{left:20px;right:20px;justify-content:center;padding:14px;}
+}
+.footer-inner{max-width:var(--maxw);margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:1fr;gap:32px;margin-bottom:36px;}
+.footer-brand .logo-text{margin-bottom:14px;display:inline-block;}
+.footer-logo-img{margin-bottom:16px;height:36px;}
+.footer-description{font-size:13.5px;line-height:1.6;color:rgba(255,255,255,0.6);max-width:380px;margin-bottom:20px;}
+.footer-fact-box{display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;max-width:380px;margin-bottom:20px;}
+.footer-fact{flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.1);}
+.footer-fact:last-child{border-right:none;}
+.footer-fact .ff-title{font-size:13px;font-weight:700;color:var(--white);}
+.footer-fact .ff-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+.social-icons{display:flex;gap:8px;}
+.social-icons a{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--white);border-radius:11px;font-size:13px;transition:background .15s, border-color .15s;}
+.social-icons a:hover{background:rgba(245,197,24,0.12);border-color:rgba(245,197,24,0.4);color:var(--orange);}
+.footer-col-links .footer-heading{font-size:13px;font-weight:600;color:var(--white);margin-bottom:14px;text-transform:uppercase;letter-spacing:.04em;}
+.footer-links-list li{margin-bottom:10px;}
+.footer-links-list a{font-size:13.5px;color:rgba(255,255,255,0.6);transition:color .15s;}
+.footer-links-list a:hover{color:var(--white);}
+.footer-divider{height:1px;background:rgba(255,255,255,0.1);margin:0 0 20px;}
+.footer-bottom{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
+.copyright-text{font-size:12.5px;color:rgba(255,255,255,0.5);}
+@media(min-width:600px) and (max-width:879px){
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .footer-brand{grid-column:1 / -1;}
+}
+@media(min-width:880px){
+  .footer-top{grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;}
+}
+/* ========== ILLUSTRATION SPLIT-ROW SYSTEM ========== */
+/* Reusable pattern: text on one side, illustration slot on the other.
+   Add .split-row--reverse to flip which side the illustration sits on. */
+.split-row{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:28px;
+  align-items:center;
+}
+.split-row .split-text{display:flex;flex-direction:column;text-align:left;}
+.split-row .split-art{
+  position:relative;
+  border-radius:22px;
+  overflow:hidden;
+  min-height:220px;
+  display:flex;align-items:center;justify-content:center;
+}
+.split-art .art-placeholder-label{
+  text-align:center;
+  padding:20px;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--muted-on-dark);
+  line-height:1.6;
+  max-width:260px;
+}
+.bcard.light .split-art .art-placeholder-label{color:var(--muted-label);}
+.split-art .art-placeholder-label .art-tag{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--orange);
+  margin-bottom:6px;
+}
+.split-art .art-ico{width:34px;height:34px;margin:0 auto 12px;opacity:.55;}
+.split-art .art-ico svg{width:100%;height:100%;}
+.split-row .split-art.split-art--logo,
+.bcard.light .split-row .split-art.split-art--logo{
+  background:none;
+  border:none;
+  padding:24px;
+}
+.split-art--logo img{
+  width:100%;
+  height:auto;
+  max-width:420px;
+  object-fit:contain;
+  border:6px solid #d8dadd;
+  border-radius:18px;
+  background:#fff;
+  padding:18px 22px;
+}
+@media(min-width:700px){
+  .split-row{grid-template-columns:1.15fr 1fr;gap:40px;}
+  .split-row--reverse{grid-template-columns:1fr 1.15fr;}
+  .split-row--reverse .split-text{order:2;}
+  .split-row--reverse .split-art{order:1;}
+  .split-art{min-height:280px;}
+  .split-art--logo img{max-width:520px;}
+}
+/* gentle parallax drift on illustration slots as they enter view */
+.split-art{
+  transform:translateY(14px);
+  opacity:.001;
+  transition:transform .7s cubic-bezier(.21,.85,.35,1), opacity .7s ease;
+}
+.split-art.kinetic-ready{transform:translateY(0);opacity:1;}
+@media (prefers-reduced-motion: reduce){
+  .split-art{transition:none;transform:none;opacity:1;}
+}
+
+/* ========== COMPACT CORNER ICON SLOT (small bento cards) ========== */
+/* For tighter cards (Why, Stat) where a full split-art slot won't fit —
+   a small reserved icon mark in the corner instead. */
+.icon-slot{
+  position:absolute;
+  top:24px;right:24px;
+  width:52px;height:52px;
+  border-radius:14px;
+  border:1px solid rgba(245,197,24,0.25);
+  background:rgba(245,197,24,0.05);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  transform:scale(.88);
+  transition:transform .55s cubic-bezier(.21,.85,.35,1), opacity .55s ease;
+}
+.icon-slot.kinetic-ready{opacity:1;transform:scale(1);}
+.bcard.light .icon-slot{border-color:rgba(16,17,19,0.2);}
+.icon-slot .icon-slot-mark{font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted-on-dark);text-align:center;line-height:1.35;padding:6px;}
+.bcard.light .icon-slot .icon-slot-mark{color:var(--muted-label);}
+.bcard{position:relative;}
+@media (prefers-reduced-motion: reduce){
+  .icon-slot{transition:none;opacity:1;transform:none;}
+}
+@media(max-width:600px){
+  .icon-slot{display:none;}
+}
+
+/* ========== KINETIC TYPOGRAPHY (scroll-triggered, dark cards only) ========== */
+.kinetic-word{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(0.5em) rotate(2deg);
+  filter:blur(6px);
+  transition:opacity .6s cubic-bezier(.21,.85,.35,1), transform .6s cubic-bezier(.21,.85,.35,1), filter .6s cubic-bezier(.21,.85,.35,1);
+  transition-delay:var(--kdelay,0s);
+  will-change:opacity, transform, filter;
+}
+.kinetic-ready .kinetic-word{
+  opacity:1;
+  transform:translateY(0) rotate(0deg);
+  filter:blur(0px);
+}
+.kinetic-eyebrow{
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.kinetic-eyebrow.kinetic-ready{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .kinetic-word, .kinetic-eyebrow{opacity:1 !important;transform:none !important;filter:none !important;transition:none !important;}
+}
+/* ========== SPIRAL TEXT FILL (CTA card) ========== */
+.row-spiral{grid-template-columns:1fr;}
+.spiral-card{background:#000 !important;position:relative;overflow:hidden;min-height:420px;padding:0;}
+.spiral-fill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.spiral-fill svg{width:140%;height:140%;animation:spiral-rotate 40s linear infinite;}
+.spiral-fill .ring-text{font-family:'Inter',sans-serif;font-weight:700;fill:#fff;text-transform:uppercase;}
+@keyframes spiral-rotate{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+@media (prefers-reduced-motion: reduce){
+  .spiral-fill svg{animation:none;}
+}
+
+/* Spiral CTA content — only the Register button floats on top of the spiral */
+.spiral-pure-content{
+  position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  height:100%;padding:32px;
+}
+.spiral-pure-content .learn-more-btn{background:#fff;color:#000;font-size:15px;padding:14px 32px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+
+
+/* ── Problem→Solution connector ── */
+.row-problem{position:relative;}
+.problem-solution-connector{
+  display:none;
+}
+@media(min-width:700px){
+  .problem-solution-connector{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:none;
+    width:32px;
+    align-self:center;
+  }
+  .problem-solution-connector svg{
+    opacity:0.35;
+  }
+  .row-problem{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    align-items:stretch;
+  }
+}
+
+/* ========== REDESIGNED SECTION LAYOUTS ========== */
+
+
+
+/* ABOUT: Full-width editorial strip — no card box */
+.about-strip {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.about-strip-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 56px 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: start;
+}
+@media(min-width:700px){
+  .about-strip-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 72px;
+    padding: 72px 32px;
+  }
+}
+@media(min-width:960px){
+  .about-strip-inner {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 96px;
+  }
+}
+.about-strip-left {}
+.about-strip-divider {
+  width: 36px;
+  height: 2px;
+  background: var(--orange);
+  margin-bottom: 20px;
+  flex-none;
+}
+.about-strip-left h2 {
+  font-size: clamp(28px,4vw,42px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.about-strip-left p {
+  font-size: 15px;
+  line-height: 1.72;
+  color: #3a3a3a;
+  margin-bottom: 16px;
+}
+.about-strip-left .about-tagline {
+  font-size: 13.5px;
+  color: #666;
+  margin-bottom: 28px;
+}
+.about-strip-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+.about-stat-block {
+  padding: 20px 24px;
+  background: #F7F7F5;
+  border-left: 3px solid var(--orange);
+  border-radius: 0 8px 8px 0;
+}
+.about-stat-block .astat-num {
+  display: block;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  padding-bottom: 12px;
+  margin-bottom: 0;
+  border-bottom: 1px solid #E8E8E4;
+}
+.about-stat-block .astat-label {
+  display: block;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin-top: 14px;
+  padding-top: 0;
+}
+.about-strip-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  border-radius: 14px;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s;
+  align-self: flex-start;
+  text-decoration: none;
+}
+.about-strip-cta:hover { opacity: .85; }
+
+/* connector hide on redesign */
+.problem-solution-connector { display:none !important; }
+/* ========== END REDESIGNED LAYOUTS ========== */
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
+
+<!-- ==================== HEADER ==================== -->
+<header>
+  <div class="header-shell">
+    <div class="header-inner">
+      <a href="index.html" class="logo-link"><img src="logo.png" alt="CI Minds" class="logo-img"></a>
+      <nav class="main-nav">
+        <a href="#">Workshops</a>
+        <a href="#">AI Mastery</a>
+        <a href="#">AI Tool of the Day</a>
+        <a href="#about">About Us</a>
+        <a href="contact-us.html">Contact Us</a>
+      </nav>
+      <div class="header-right">
+        <button class="header-btn">My Account</button>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="#">Workshops</a>
+      <a href="#">AI Mastery</a>
+      <a href="#">AI Tool of the Day</a>
+      <a href="#about">About Us</a>
+      <a href="contact-us.html">Contact Us</a>
+      <div class="mobile-nav-ctas">
+        <button class="header-btn">My Account</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="bento-wrap">
+
+  <!-- ROW 1: HERO — full width, minimal -->
+  <section class="bcard hero-card" id="home" style="position:relative;overflow:hidden;">
+    <canvas id="cube-bg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.55;"></canvas>
+    <div class="hero-eyebrow kinetic-eyebrow" data-kinetic-eyebrow style="position:relative;z-index:1;">
+      <span>Home</span><span class="sep">›</span><span>AI &amp; Technology</span><span class="sep">›</span><span class="current">Fundamentals</span>
+    </div>
+    <div class="hero-inner" style="position:relative;z-index:1;">
+
+      <!-- LEFT: headline, description, meta -->
+      <div class="hero-left">
+        <h1>Unlock <span class="accent">AI</span>.<br>No math. No coding.<br>Become <span class="accent">AI-Ready...</span></h1>
+        <p class="hero-desc">Learn <strong style="color:var(--orange);font-weight:700;">ChatGPT &amp; AI Tools</strong>, build real-world AI projects, earn a recognised certificate, and boost your career — no technical background needed.</p>
+        <div class="hero-meta">
+          <span class="stars">★★★★★</span>
+          <span class="dot">·</span>
+          <span>Self-paced, lifetime access</span>
+          <span class="dot">·</span>
+          <span>Beginner friendly</span>
+        </div>
+      </div>
+
+      <!-- MOBILE ONLY: Register Now CTA (shown only on mobile, below hero-left) -->
+      <div class="hero-mobile-cta">
+        <a href="register.html" class="btn-register-mobile">
+          Register Now
+          <span class="rn-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <span class="hero-mobile-seat-note" style="color:var(--orange);">Limited Seats Available — Reserve Yours Today.</span>
+      </div>
+
+      <!-- RIGHT: Register CTA vertically centred -->
+      <div class="hero-right-panel">
+        <a href="register.html" class="btn-register-hero">
+          Register Now
+          <span class="rn-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <span class="hero-seat-note" style="color:var(--orange);">Limited Seats Available — Reserve Yours Today.</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ROW 2: WHY (stacked 2) + WORKSHOPS (tall) -->
+  <div class="bento-row row-two">
+    <div class="col-stack">
+      <section class="bcard why-card" id="why">
+        <div class="icon-slot kinetic-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(245,197,24,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="5" cy="19" r="1.5"/><circle cx="19" cy="19" r="1.5"/><path d="M12 6.5v4M12 10.5l-5.5 7M12 10.5l5.5 7"/><path d="M9 17h6"/></svg>
+        </div>
+        <div class="eyebrow kinetic-eyebrow" data-kinetic-eyebrow>Why Choose Us</div>
+        <h2>Clear AI skills, zero theory dump.</h2>
+        <p class="why-lead">No math. No coding. Just real understanding of what AI is, and hands-on practice with ChatGPT, Canva, Notion, and more.</p>
+        <ul class="why-checks">
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4 13l5 5L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Built for students — college, pre-grad &amp; grad</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4 13l5 5L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Self-paced — learn on your own schedule</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M4 13l5 5L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save 10+ hours a week once you apply it</li>
+        </ul>
+      </section>
+      <section class="bcard stat-card" id="trust">
+        <div class="icon-slot kinetic-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(245,197,24,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div>
+          <div class="eyebrow kinetic-eyebrow" data-kinetic-eyebrow>Why It Matters</div>
+          <div class="big-num">73%</div>
+          <div class="stat-label">of employers expect AI literacy — and that number is rising.</div>
+        </div>
+        <a href="register.html" class="trust-link">See course details <span>→</span></a>
+      </section>
+    </div>
+  </div>
+
+  <div class="bento-row row-cta-solo">
+    <section class="bcard cta-card">
+      <div class="cta-big">
+        <span class="big-line" data-kinetic-text>Start Your</span>
+        <span class="big-line" data-kinetic-text>AI Journey</span>
+        <a href="register.html" class="cta-pill cta-pill--a">Register Now</a>
+        <a href="register.html" class="cta-pill cta-pill--b">Limited Seats</a>
+      </div>
+      <div class="cta-foot">
+        <p>Limited seats available — register now to lock in your spot.</p>
+        <button class="learn-more-btn" onclick="window.location.href='register.html'">Register Now</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ROW 2.4: WHAT YOU'LL LEARN — full width, stacked image/text items -->
+  <div class="bento-row row-learn">
+    <section class="bcard light ws-card" id="workshops">
+      <div class="eyebrow kinetic-eyebrow" data-kinetic-eyebrow>What You'll Learn</div>
+      <h3>AI Fundamentals Course</h3>
+
+      <div class="learn-item">
+        <div class="learn-art" data-kinetic-art aria-hidden="true">
+          <img src="1.png" alt="AI Tools in Action — ChatGPT, Canva, Notion and automation working together">
+        </div>
+        <div class="learn-text">
+          <strong>AI Tools Mastery</strong>
+          <p>Learn ChatGPT, Canva, Notion &amp; real-world automation tools — no jargon, no fluff.</p>
+          <a href="register.html" class="mini-cta">Start learning</a>
+        </div>
+      </div>
+
+      <div class="learn-item">
+        <div class="learn-art" data-kinetic-art aria-hidden="true">
+          <img src="2.png" alt="No-Code AI Skills — drag, drop, and launch with Canva AI">
+        </div>
+        <div class="learn-text">
+          <strong>No-Code AI Skills</strong>
+          <p>Build with AI tools without programming — zero technical background required.</p>
+          <a href="register.html" class="mini-cta">Register now</a>
+        </div>
+      </div>
+
+      <div class="learn-item">
+        <div class="learn-art" data-kinetic-art aria-hidden="true">
+          <img src="3.png" alt="Save 10+ hours a week — before and after task checklist comparison">
+        </div>
+        <div class="learn-text">
+          <strong>Save 10+ Hours a Week</strong>
+          <p>Hands-on with everyday AI tools — applied to real tasks, not theory.</p>
+          <a href="register.html" class="mini-cta">Register now</a>
+        </div>
+      </div>
+
+      <div class="learn-item">
+        <div class="learn-art" data-kinetic-art aria-hidden="true">
+          <img src="4.png" alt="Student applying AI tools to a real study app project, working at a laptop">
+        </div>
+        <div class="learn-text">
+          <strong>Real Application, Not Just Theory</strong>
+          <p>Learn how AI is actually used day-to-day, with practical examples throughout.</p>
+          <a href="register.html" class="mini-cta">Register now</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ROW 2.5: PROBLEM → SOLUTION -->
+  <div class="bento-row row-problem">
+    <section class="bcard problem-card">
+      <div class="icon-slot kinetic-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(245,197,24,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="rgba(245,197,24,0.7)"/></svg>
+      </div>
+      <div class="eyebrow kinetic-eyebrow" data-kinetic-eyebrow>The Problem</div>
+      <h3>Most students still don't have practical AI skills.</h3>
+      <p>Knowing AI exists isn't the same as knowing how to use it — and that gap is starting to matter in real opportunities.</p>
+    </section>
+    <div class="problem-solution-connector" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12H19M19 12L13 6M19 12L13 18"/></svg>
+    </div>
+    <section class="bcard solution-card">
+      <div class="icon-slot kinetic-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(245,197,24,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.6 9.5 8 11 4.4-1.5 8-6 8-11V6l-8-4z"/><polyline points="9 12 11 14 15 10"/></svg>
+      </div>
+      <div class="eyebrow kinetic-eyebrow" data-kinetic-eyebrow>The Solution</div>
+      <h3>Real, usable AI skills — not just theory.</h3>
+      <p>This course gives you practical AI skills you can start using immediately, with no math or coding background needed.</p>
+      <a href="register.html" class="register-btn">Upgrade My Skills</a>
+    </section>
+  </div>
+
+  <!-- ROW 3: ABOUT — full-width editorial strip -->
+  <div class="bento-row row-three">
+    <section class="bcard light about-card about-strip" id="about">
+      <div class="about-strip-inner">
+        <div class="about-strip-left">
+          <div class="about-strip-divider"></div>
+          <div class="eyebrow" style="color:rgba(16,17,19,0.45);font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;margin-bottom:16px;">About Us</div>
+          <h2>CI Minds is built for students who want to <em>actually use</em> AI.</h2>
+          <p>College, pre-grad, grad — no matter where you are in your education, this course meets you there. No math. No coding. Just a clear, self-paced path to understanding what AI is, how it works, and how to put tools like ChatGPT, Canva, and Notion to work in real life.</p>
+          <p>Once you're in, you study at your own pace, apply what you learn from day one, and save 10+ hours a week — instead of just collecting theory you never use.</p>
+          <p class="about-tagline">Beginner-friendly. Certificate included. No background required.</p>
+          <a href="register.html" class="about-strip-cta">Join the Program <span style="margin-left:2px;">→</span></a>
+        </div>
+        <div class="about-strip-right">
+          <div class="about-stat-block">
+            <div class="astat-num">10+</div>
+            <div class="astat-label">hours saved per week once you start applying AI to everyday tasks</div>
+          </div>
+          <div class="about-stat-block">
+            <div class="astat-num">73%</div>
+            <div class="astat-label">of employers now expect some degree of AI literacy from new hires</div>
+          </div>
+          <div class="about-stat-block">
+            <div class="astat-num">0</div>
+            <div class="astat-label">math or coding prerequisites — just bring curiosity</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="logo.png" alt="CI Minds" class="logo-img footer-logo-img">
+        <p class="footer-description">Helping students actually understand AI — no math, no coding, just clear, practical skills you can use right away.</p>
+        <div class="footer-fact-box">
+          <div class="footer-fact"><div class="ff-title">Self-Paced</div><div class="ff-sub">Learn on your schedule</div></div>
+          <div class="footer-fact"><div class="ff-title">Lifetime Access</div><div class="ff-sub">No math · No coding</div></div>
+        </div>
+        <div class="social-icons">
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col-links">
+        <div class="footer-heading">Course</div>
+        <ul class="footer-links-list">
+          <li><a href="#workshops">AI Fundamentals Course</a></li>
+        </ul>
+      </div>
+      <div class="footer-col-links">
+        <div class="footer-heading">Company</div>
+        <ul class="footer-links-list">
+          <li><a href="#about">About Us</a></li>
+          <li><a href="contact-us.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col-links">
+        <div class="footer-heading">Get Started</div>
+        <ul class="footer-links-list">
+          <li><a href="register.html">Register Now</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom">
+      <span class="copyright-text">Copyright © 2026 CI Minds. All rights reserved</span>
+    </div>
+  </div>
+</footer>
+
+<a href="register.html" class="sticky-cta" id="stickyCta">Register Now <span class="arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="#101113" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+
+<script>
+  // ===== Subtle background parallax =====
+  // The grid texture drifts a fraction of the scroll distance so it reads
+  // as a quiet, constant backdrop with gentle depth rather than a static
+  // tile or a layer that scrolls 1:1 with content.
+  var bgLayer = document.getElementById('bgLayer');
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(bgLayer && !prefersReducedMotion){
+    var ticking = false;
+    function updateParallax(){
+      var offset = window.scrollY * 0.06;
+      bgLayer.style.backgroundPosition = '0 ' + (-offset) + 'px, 0 ' + (-offset) + 'px';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function(){
+      if(!ticking){
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+    updateParallax();
+  }
+
+  var siteHeader = document.querySelector('header');
+  if(siteHeader){
+    function updateHeaderShadow(){
+      if(window.scrollY > 8){
+        siteHeader.classList.add('is-scrolled');
+      } else {
+        siteHeader.classList.remove('is-scrolled');
+      }
+    }
+    window.addEventListener('scroll', updateHeaderShadow, { passive: true });
+    updateHeaderShadow();
+  }
+
+  var navToggle = document.getElementById('navToggle');
+  var mobileNav = document.getElementById('mobileNav');
+  if(navToggle && mobileNav){
+    navToggle.setAttribute('aria-expanded', 'false');
+    navToggle.addEventListener('click', function(){
+      var isOpen = mobileNav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    mobileNav.querySelectorAll('a').forEach(function(link){
+      link.addEventListener('click', function(){
+        mobileNav.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  var stickyCta = document.getElementById('stickyCta');
+  var heroCard = document.querySelector('.hero-card');
+  var footer = document.querySelector('.site-footer');
+  if(stickyCta && heroCard && footer){
+    function updateStickyCta(){
+      var heroBottom = heroCard.getBoundingClientRect().bottom;
+      var footerTop = footer.getBoundingClientRect().top;
+      var pastHero = heroBottom < 0;
+      var nearFooter = footerTop < window.innerHeight + 200;
+      if(pastHero && !nearFooter){
+        stickyCta.classList.add('visible');
+      } else {
+        stickyCta.classList.remove('visible');
+      }
+    }
+    window.addEventListener('scroll', updateStickyCta, { passive: true });
+    window.addEventListener('resize', updateStickyCta);
+    updateStickyCta();
+  }
+
+  // ===== Hero Typewriter: split heading into per-character spans =====
+  // Reveals one real character at a time (true typewriter), correctly
+  // handling nested markup (e.g. the orange "AI" accent span) by walking
+  // actual text nodes rather than measuring container width. Runs once,
+  // then a blinking cursor stops after a few blinks.
+  document.querySelectorAll('[data-typewriter]').forEach(function(h1){
+    var cursor = h1.querySelector('.tw-cursor');
+    if(cursor) cursor.remove();
+
+    var charIndex = 0;
+    var STEP = 0.045; // seconds between characters
+
+    function wrapTextNode(node){
+      var text = node.textContent;
+      var frag = document.createDocumentFragment();
+      for(var i = 0; i < text.length; i++){
+        var ch = text[i];
+        var span = document.createElement('span');
+        span.className = 'tw-char';
+        span.style.setProperty('--tdelay', (charIndex * STEP) + 's');
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+        charIndex++;
+        frag.appendChild(span);
+      }
+      node.parentNode.replaceChild(frag, node);
+    }
+
+    // Walk all text nodes within the heading (including inside the
+    // accent span) and convert each into per-character spans in place,
+    // so DOM order (and therefore visual order) is preserved exactly.
+    var walker = document.createTreeWalker(h1, NodeFilter.SHOW_TEXT, null, false);
+    var textNodes = [];
+    var n;
+    while((n = walker.nextNode())) textNodes.push(n);
+    textNodes.forEach(wrapTextNode);
+
+    if(cursor){
+      cursor.style.setProperty('--tcursor-delay', (charIndex * STEP + 0.2) + 's');
+      h1.appendChild(cursor);
+    }
+  });
+
+  // ===== Kinetic Typography: split headline text into per-word spans =====
+  // Each word gets its own staggered delay so the reveal moves like a wave
+  // across the line, rather than the whole heading fading in as one block.
+  document.querySelectorAll('[data-kinetic-text]').forEach(function(el){
+    var nodes = Array.prototype.slice.call(el.childNodes);
+    el.innerHTML = '';
+    var wordIndex = 0;
+    nodes.forEach(function(node){
+      if(node.nodeType === Node.TEXT_NODE){
+        var words = node.textContent.split(/(\s+)/);
+        words.forEach(function(w){
+          if(w.trim() === ''){
+            el.appendChild(document.createTextNode(w));
+          } else {
+            var span = document.createElement('span');
+            span.className = 'kinetic-word';
+            span.textContent = w;
+            span.style.setProperty('--kdelay', (wordIndex * 0.045) + 's');
+            wordIndex++;
+            el.appendChild(span);
+          }
+        });
+      } else {
+        // Preserve existing elements (e.g. the <span class="accent">) but
+        // wrap their own text content in kinetic words too.
+        var clone = node.cloneNode(false);
+        var innerWords = node.textContent.split(/(\s+)/);
+        innerWords.forEach(function(w){
+          if(w.trim() === ''){
+            clone.appendChild(document.createTextNode(w));
+          } else {
+            var span2 = document.createElement('span');
+            span2.className = 'kinetic-word';
+            span2.textContent = w;
+            span2.style.setProperty('--kdelay', (wordIndex * 0.045) + 's');
+            wordIndex++;
+            clone.appendChild(span2);
+          }
+        });
+        el.appendChild(clone);
+      }
+    });
+  });
+
+  // ===== Scroll-triggered reveal =====
+  // Fires once per element the first time it enters the viewport, then
+  // stops observing it — this is an entrance effect per section, not a
+  // repeating animation that replays every time you scroll past it.
+  if('IntersectionObserver' in window){
+    var kineticObserver = new IntersectionObserver(function(entries, obs){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('kinetic-ready');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.35, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('[data-kinetic-text]').forEach(function(el){
+      kineticObserver.observe(el);
+    });
+    document.querySelectorAll('[data-kinetic-eyebrow]').forEach(function(el){
+      kineticObserver.observe(el);
+    });
+    document.querySelectorAll('[data-kinetic-art]').forEach(function(el){
+      kineticObserver.observe(el);
+    });
+    document.querySelectorAll('.icon-slot').forEach(function(el){
+      kineticObserver.observe(el);
+    });
+  } else {
+    // No IntersectionObserver support — just show everything immediately.
+    document.querySelectorAll('[data-kinetic-text], [data-kinetic-eyebrow], [data-kinetic-art], .icon-slot').forEach(function(el){
+      el.classList.add('kinetic-ready');
+    });
+  }
+</script>
+
+<script>
+(function(){
+  const canvas = document.getElementById('cube-bg');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize(){
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  let t = 0;
+
+  function draw(){
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Horizon sits at 52% height
+    const vpx = W * 0.5, vpy = H * 0.52;
+    const bottom = H * 1.02;
+
+    const VCOLS = 22;
+    const HROWS = 16;
+
+    // Glow colour
+    const cyan = '30,100,255';
+
+    // Infinite INWARD scroll: rows shrink toward the vanishing point.
+    // Speed tuned to mid-fast — feels like flying into the grid.
+    const scrollSpeed = 1.4;
+
+    // --- Vertical (converging) lines ---
+    const spread = W * 1.6;
+    for(let i = 0; i <= VCOLS; i++){
+      const frac = i / VCOLS;
+      const xBottom = (W - spread) / 2 + spread * frac;
+
+      const distCentre = Math.abs(frac - 0.5) * 2;
+      const alpha = 0.75 - distCentre * 0.45;
+
+      const grad = ctx.createLinearGradient(vpx, vpy, xBottom, bottom);
+      grad.addColorStop(0,   `rgba(${cyan},0)`);
+      grad.addColorStop(0.25,`rgba(${cyan},${(alpha * 0.4).toFixed(2)})`);
+      grad.addColorStop(1,   `rgba(${cyan},${alpha.toFixed(2)})`);
+
+      ctx.beginPath();
+      ctx.moveTo(vpx, vpy);
+      ctx.lineTo(xBottom, bottom);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 0.6 + (1 - distCentre) * 0.7;
+      ctx.shadowColor = `rgba(${cyan},0.7)`;
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+    }
+
+    // --- Horizontal lines with infinite inward scroll ---
+    // We draw more rows than needed and offset by t so they loop seamlessly
+    // Inward movement: each row starts near the bottom and shrinks toward horizon.
+    // We spawn HROWS+4 rows. The offset `phase` subtracts from j so that as t
+    // increases, each row's fraction DECREASES — moving it UP toward the horizon.
+    // When a row crosses the horizon (frac→0) a new one spawns at the bottom.
+    const totalRows = HROWS + 4;
+    const phase = (t * scrollSpeed) % 1; // 0..1 looping offset
+    for(let j = 0; j < totalRows; j++){
+      // Subtract phase so rows travel toward smaller fractions (horizon = inward)
+      let rawFrac = (j + 1 - phase) / HROWS;
+      // Wrap: if rawFrac goes ≤0 put it back at the far end (bottom entry)
+      if(rawFrac <= 0) rawFrac += totalRows / HROWS;
+      if(rawFrac > 1.05) continue; // skip rows beyond bottom
+      if(rawFrac < 0.01) continue; // skip rows that reached the horizon
+      const frac = Math.min(Math.pow(rawFrac, 1.8), 1); // perspective bunching
+
+      const y = vpy + (bottom - vpy) * frac;
+      if(y > bottom) continue;
+
+      const spread_y = W * 1.6 * frac;
+      const xLeft  = (W - spread_y) / 2;
+      const xRight = (W + spread_y) / 2;
+
+      // Fade in rows that just appeared near horizon, fade out beyond bottom
+      let alpha = 0.15 + frac * 0.7;
+      // Fade in near top
+      if(rawFrac < 0.08) alpha *= rawFrac / 0.08;
+      const lineW = 0.5 + frac * 1.2;
+
+      const grad = ctx.createLinearGradient(xLeft, y, xRight, y);
+      grad.addColorStop(0,   `rgba(${cyan},0)`);
+      grad.addColorStop(0.15,`rgba(${cyan},${alpha.toFixed(2)})`);
+      grad.addColorStop(0.5, `rgba(${cyan},${Math.min(alpha+0.2,1).toFixed(2)})`);
+      grad.addColorStop(0.85,`rgba(${cyan},${alpha.toFixed(2)})`);
+      grad.addColorStop(1,   `rgba(${cyan},0)`);
+
+      ctx.beginPath();
+      ctx.moveTo(xLeft, y);
+      ctx.lineTo(xRight, y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = lineW;
+      ctx.shadowColor = `rgba(${cyan},0.5)`;
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+    }
+
+    // Horizon glow
+    const hGrad = ctx.createRadialGradient(vpx, vpy, 0, vpx, vpy, W * 0.55);
+    hGrad.addColorStop(0,   'rgba(30,100,255,0.25)');
+    hGrad.addColorStop(0.5, 'rgba(10,50,180,0.10)');
+    hGrad.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = hGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.shadowBlur = 0;
+    t += 0.03;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
+</script>
+<style>@keyframes tw-blink{0%,100%{opacity:1;}50%{opacity:0;}}</style>
+<script>
+(function(){
+  const el = document.getElementById('typewriter-text');
+  const cursor = document.getElementById('typewriter-cursor');
+  if(!el) return;
+  const word = 'AI-Ready';
+  let i = 0;
+  function tick(){
+    el.textContent = word.slice(0, i+1);
+    i++;
+    if(i < word.length){ setTimeout(tick, 100); }
+    else { setTimeout(()=>{ cursor.style.animation='none'; cursor.style.opacity='0'; }, 1500); }
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
