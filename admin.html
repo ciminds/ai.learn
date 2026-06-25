@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBK Admin — Internal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0D0D0D; --s1: #111111; --s2: #171717; --s3: #1E1E1E;
+            --violet: #6366F1; --vd: #4F46E5; --vl: #818CF8;
+            --text: #F0EFFF; --muted: rgba(240,239,255,0.45);
+            --dim: rgba(240,239,255,0.25); --border: rgba(255,255,255,0.07);
+            --bmd: rgba(255,255,255,0.12);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; }
+
+        /* ── Auth gate ── */
+        #auth-gate {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; flex-direction: column; gap: 20px;
+        }
+        #auth-gate.hidden { display: none; }
+        #auth-gate .logo {
+            width: 48px; height: 48px; border-radius: 14px; background: var(--vd);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 32px rgba(99,102,241,0.5);
+        }
+        #auth-gate h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+        #auth-gate p  { font-size: 13px; color: var(--muted); }
+        #google-signin-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 24px; background: var(--s2);
+            border: 1px solid var(--bmd); border-radius: 10px;
+            color: var(--text); font-family: 'Nunito', sans-serif;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        #google-signin-btn:hover { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+        #auth-error { font-size: 13px; color: #F87171; display: none; }
+
+        /* ── Layout ── */
+        #admin-app { display: none; }
+        #admin-app.visible { display: block; }
+
+        header {
+            height: 56px; background: var(--s1);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; position: sticky; top: 0; z-index: 10;
+        }
+        .header-logo { display: flex; align-items: center; gap: 10px; }
+        .header-logo .icon {
+            width: 30px; height: 30px; border-radius: 8px; background: var(--vd);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .header-logo span { font-size: 14px; font-weight: 800; }
+        .admin-badge {
+            font-size: 10px; font-weight: 700; padding: 2px 8px;
+            background: rgba(99,102,241,0.15); color: var(--vl);
+            border-radius: 99px; letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .signout-btn {
+            font-size: 12px; font-weight: 600; color: var(--muted);
+            background: none; border: none; cursor: pointer;
+            padding: 6px 12px; border-radius: 7px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .signout-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+
+        main { padding: 28px 28px 48px; max-width: 1100px; }
+
+        h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.02em; }
+        .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+        /* ── Stat cards ── */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+        @media (max-width: 768px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .stat-grid { grid-template-columns: 1fr; } }
+
+        .stat-card {
+            background: var(--s2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 18px 20px;
+        }
+        .stat-label { font-size: 11px; font-weight: 700; color: var(--dim);
+            text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+        .stat-value { font-size: 28px; font-weight: 800; line-height: 1; }
+        .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        .stat-value.green { color: #34D399; }
+        .stat-value.violet { color: var(--vl); }
+        .stat-value.white { color: var(--text); }
+
+        /* ── Section card ── */
+        .section-card {
+            background: var(--s2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px; margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: 13px; font-weight: 700; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.07em;
+            margin-bottom: 16px; padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── Enrollment table ── */
+        .enroll-table { width: 100%; border-collapse: collapse; }
+        .enroll-table th {
+            font-size: 10px; font-weight: 700; color: var(--dim);
+            text-transform: uppercase; letter-spacing: 0.07em;
+            text-align: left; padding: 0 12px 10px; border-bottom: 1px solid var(--border);
+        }
+        .enroll-table td {
+            font-size: 13px; padding: 11px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: rgba(240,239,255,0.8);
+        }
+        .enroll-table tr:last-child td { border-bottom: none; }
+        .enroll-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .badge {
+            display: inline-block; font-size: 10px; font-weight: 700;
+            padding: 2px 7px; border-radius: 99px;
+        }
+        .badge-founding { background: rgba(99,102,241,0.15); color: var(--vl); }
+        .badge-enrolled  { background: rgba(52,211,153,0.12); color: #34D399; }
+        .badge-pending   { background: rgba(245,158,11,0.12); color: #FCD34D; }
+
+        /* ── Module completion bars ── */
+        .module-row { margin-bottom: 12px; }
+        .module-name { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .prog-bg { background: rgba(255,255,255,0.06); border-radius: 99px; height: 6px; overflow: hidden; }
+        .prog-fill { height: 100%; border-radius: 99px; background: var(--violet); transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+        /* ── Loading skeleton ── */
+        .skeleton {
+            background: linear-gradient(90deg, var(--s2) 25%, var(--s3) 50%, var(--s2) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.6s infinite;
+            border-radius: 6px;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── Refresh btn ── */
+        .refresh-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 8px 16px; background: var(--s3);
+            border: 1px solid var(--border); border-radius: 9px;
+            color: var(--muted); font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all 0.15s; font-family: 'Nunito', sans-serif;
+        }
+        .refresh-btn:hover { border-color: var(--violet); color: var(--text); }
+
+        /* ── Empty state ── */
+        .empty { text-align: center; padding: 32px; color: var(--dim); font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<!-- ── Auth Gate ── -->
+<div id="auth-gate">
+    <div class="logo">
+        <svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+    </div>
+    <h1>CBK Admin</h1>
+    <p>Authorized personnel only</p>
+    <button id="google-signin-btn" onclick="adminSignIn()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.31z"/></svg>
+        Sign in with Google
+    </button>
+    <p id="auth-error"></p>
+</div>
+
+<!-- ── Admin App ── -->
+<div id="admin-app">
+    <header>
+        <div class="header-logo">
+            <div class="icon">
+                <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+            </div>
+            <span>CBK Minds</span>
+            <span class="admin-badge">Admin</span>
+        </div>
+        <button class="signout-btn" onclick="adminSignOut()">Sign out</button>
+    </header>
+
+    <main>
+        <h2>Dashboard</h2>
+        <p class="subtitle" id="last-updated">Loading data...</p>
+
+        <div class="stat-grid" id="stat-grid">
+            <div class="stat-card"><div class="stat-label">Total Enrolled</div><div class="stat-value violet skeleton" id="stat-enrolled" style="height:32px;width:60px;">&nbsp;</div></div>
+            <div class="stat-card"><div class="stat-label">Revenue (₹)</div><div class="stat-value green skeleton" id="stat-revenue" style="height:32px;width:80px;">&nbsp;</div></div>
+            <div class="stat-card"><div class="stat-label">Founding Members</div><div class="stat-value white skeleton" id="stat-founding" style="height:32px;width:50px;">&nbsp;</div></div>
+            <div class="stat-card"><div class="stat-label">Avg Completion</div><div class="stat-value violet skeleton" id="stat-completion" style="height:32px;width:60px;">&nbsp;</div></div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <h3 style="font-size:15px;font-weight:800;">Recent Enrollments</h3>
+            <button class="refresh-btn" onclick="loadAdminData()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Refresh
+            </button>
+        </div>
+
+        <div class="section-card">
+            <table class="enroll-table" id="enrollments-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Enrolled</th>
+                        <th>Progress</th>
+                        <th>Type</th>
+                        <th>Payment ID</th>
+                    </tr>
+                </thead>
+                <tbody id="enrollments-body">
+                    <tr><td colspan="6" class="empty">Loading enrollments…</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">Module Completion Rates</div>
+            <div id="module-completion-bars">
+                <div class="skeleton" style="height:40px;border-radius:8px;margin-bottom:10px;"></div>
+                <div class="skeleton" style="height:40px;border-radius:8px;margin-bottom:10px;"></div>
+                <div class="skeleton" style="height:40px;border-radius:8px;"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ── Firebase ── -->
+<script type="module">
+import { initializeApp }          from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+                                   from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs, orderBy, limit }
+                                   from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+// ── Import your firebase config ──────────────────────────────────────────────
+// This admin panel must be served from an authorized domain.
+// It NEVER runs in production — use Firebase Hosting with IP restrictions.
+import { firebaseConfig } from './firebase-config.js';
+
+// ── ADMIN WHITELIST — add your email(s) here ─────────────────────────────────
+const ADMIN_EMAILS = [
+    // 'yourname@gmail.com',   // ← ADD YOUR EMAIL HERE
+];
+// ─────────────────────────────────────────────────────────────────────────────
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const MODULES = [
+    'Module 1: How AI Works',
+    'Module 2: Prompt Engineering',
+    'Module 3: AI Tools A–Z',
+    'Module 4: Automation',
+    'Module 5: AI for Business',
+    'Module 6: Advanced Workflows',
+];
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+window.adminSignIn = async function() {
+    try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+    } catch (err) {
+        const errEl = document.getElementById('auth-error');
+        errEl.textContent = 'Sign-in failed: ' + err.message;
+        errEl.style.display = 'block';
+    }
+};
+
+window.adminSignOut = async function() {
+    await signOut(auth);
+    document.getElementById('admin-app').classList.remove('visible');
+    document.getElementById('auth-gate').classList.remove('hidden');
+};
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        document.getElementById('admin-app').classList.remove('visible');
+        document.getElementById('auth-gate').classList.remove('hidden');
+        return;
+    }
+
+    if (ADMIN_EMAILS.length > 0 && !ADMIN_EMAILS.includes(user.email)) {
+        await signOut(auth);
+        const errEl = document.getElementById('auth-error');
+        errEl.textContent = 'Access denied. This account is not authorized.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    document.getElementById('auth-gate').classList.add('hidden');
+    document.getElementById('admin-app').classList.add('visible');
+    loadAdminData();
+});
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+window.loadAdminData = async function() {
+    try {
+        // Query all enrolled users
+        const usersRef  = collection(db, 'users');
+        const qEnrolled = query(usersRef, where('enrolled', '==', true), orderBy('enrolledAt', 'desc'), limit(50));
+        const snap      = await getDocs(qEnrolled);
+
+        const users = [];
+        snap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+
+        // ── Stats ──────────────────────────────────────────────────────────
+        const totalEnrolled  = users.length;
+        const foundingCount  = users.filter(u => u.foundingMember).length;
+        // Revenue: founding members paid ₹499, others ₹999
+        const revenue        = users.reduce((sum, u) => sum + (u.foundingMember ? 499 : 999), 0);
+
+        // Completion: from cbkCourseState — approximate from progress keys
+        let totalCompletion = 0;
+        users.forEach(u => {
+            const prog = u.progress || {};
+            const keys = Object.keys(prog).filter(k => !k.startsWith('proj_'));
+            // Total possible lessons ~18 (rough)
+            totalCompletion += Math.min(100, Math.round((keys.length / 18) * 100));
+        });
+        const avgCompletion = totalEnrolled > 0 ? Math.round(totalCompletion / totalEnrolled) : 0;
+
+        // Update stat cards
+        setStatValue('stat-enrolled',   totalEnrolled,  'violet');
+        setStatValue('stat-revenue',    '₹' + revenue.toLocaleString('en-IN'), 'green');
+        setStatValue('stat-founding',   foundingCount,  'white');
+        setStatValue('stat-completion', avgCompletion + '%', 'violet');
+
+        // ── Enrollments table ──────────────────────────────────────────────
+        const tbody = document.getElementById('enrollments-body');
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">No enrollments yet.</td></tr>';
+        } else {
+            tbody.innerHTML = users.map(u => {
+                const enrolledDate = u.enrolledAt?.toDate
+                    ? u.enrolledAt.toDate().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
+                    : '—';
+                const prog    = u.progress || {};
+                const progPct = Math.min(100, Math.round((Object.keys(prog).filter(k => !k.startsWith('proj_')).length / 18) * 100));
+                const typeTag = u.foundingMember
+                    ? '<span class="badge badge-founding">⭐ Founding</span>'
+                    : '<span class="badge badge-enrolled">Enrolled</span>';
+                const payId   = u.paymentId ? u.paymentId.slice(0, 18) + '…' : '—';
+                const name    = (u.displayName || u.email || u.id).slice(0, 24);
+                const email   = (u.email || '—').slice(0, 28);
+
+                return `<tr>
+                    <td style="font-weight:700;">${name}</td>
+                    <td style="color:var(--muted);font-size:12px;">${email}</td>
+                    <td style="color:var(--muted);font-size:12px;">${enrolledDate}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="width:60px;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+                                <div style="width:${progPct}%;height:100%;background:#6366F1;border-radius:99px;"></div>
+                            </div>
+                            <span style="font-size:11px;font-weight:700;color:var(--muted);">${progPct}%</span>
+                        </div>
+                    </td>
+                    <td>${typeTag}</td>
+                    <td style="color:var(--dim);font-size:11px;font-family:monospace;">${payId}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Module completion bars ─────────────────────────────────────────
+        // Approximate from lesson IDs (m1l1, m2l3, etc.)
+        const moduleCompletion = MODULES.map((mod, idx) => {
+            const moduleNum = idx + 1;
+            const done = users.filter(u => {
+                const prog = u.progress || {};
+                return Object.keys(prog).some(k => k.startsWith('m' + moduleNum + 'l'));
+            }).length;
+            return { mod, pct: totalEnrolled > 0 ? Math.round((done / totalEnrolled) * 100) : 0 };
+        });
+
+        document.getElementById('module-completion-bars').innerHTML = moduleCompletion.map(({ mod, pct }) => `
+            <div class="module-row">
+                <div class="module-name">
+                    <span>${mod.replace(/^Module \d+: /, '')}</span>
+                    <span style="color:var(--vl);font-weight:800;">${pct}%</span>
+                </div>
+                <div class="prog-bg">
+                    <div class="prog-fill" style="width:${pct}%"></div>
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('last-updated').textContent =
+            'Last updated: ' + new Date().toLocaleTimeString('en-IN') + ' · ' + totalEnrolled + ' total students';
+
+    } catch (err) {
+        console.error('[CBK Admin] Load error:', err);
+        document.getElementById('last-updated').textContent = 'Error loading data: ' + err.message;
+    }
+};
+
+function setStatValue(id, val, colorClass) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'stat-value ' + colorClass;
+    el.style = '';
+    el.textContent = val;
+}
+</script>
+</body>
+</html>
