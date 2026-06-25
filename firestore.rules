@@ -1,0 +1,79 @@
+// CBK Innovative Minds — Firestore Security Rules
+// Version: 3.0 — MERGED (original hardened rules + enrolled protection)
+//
+// What this file does:
+//   1. enrolled / foundingMember / paymentId can NEVER be written by the client
+//      Only the Cloud Function (verifyPayment) writes these fields
+//   2. Users can only read/write their OWN documents
+//   3. payments sub-collection is immutable once written (no edits/deletes)
+//   4. registrations — server enforces one registration per user (!exists)
+//   5. Catch-all deny blocks all unknown collection paths
+// ─────────────────────────────────────────────────────────────────────────────
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── users/{userId} ──────────────────────────────────────────────────────
+    // Profile, enrollment status, course progress, session ID.
+    // Only the signed-in owner can read/write — but CANNOT touch
+    // enrolled, foundingMember, or paymentId (server-only fields).
+    match /users/{userId} {
+
+      // Read: owner only
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Create: owner only, cannot set protected fields
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && !('enrolled'       in request.resource.data)
+                    && !('foundingMember' in request.resource.data)
+                    && !('paymentId'      in request.resource.data);
+
+      // Update: owner only, cannot modify protected fields
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !('enrolled'       in request.resource.data.diff(resource.data).affectedKeys())
+                    && !('foundingMember' in request.resource.data.diff(resource.data).affectedKeys())
+                    && !('paymentId'      in request.resource.data.diff(resource.data).affectedKeys());
+
+      // Delete: nobody
+      allow delete: if false;
+
+      // ── users/{userId}/payments/{paymentId} ───────────────────────────────
+      // Immutable once written — owner can create and read,
+      // but can never edit or delete their payment records.
+      match /payments/{paymentId} {
+        allow read, create: if request.auth != null
+                            && request.auth.uid == userId;
+        allow update, delete: if false;
+      }
+    }
+
+    // ── registrations/{userId} ──────────────────────────────────────────────
+    // The seat-reservation record from register.html.
+    // Fully separate from "users" (enrollment data) on purpose.
+    //
+    // SERVER-SIDE RATE LIMIT:
+    //   The !exists() guard means Firestore will reject any create attempt
+    //   if a document for this user already exists. Combined with
+    //   allow update: if false this makes double-registration physically
+    //   impossible — even if someone bypasses all client-side checks.
+    match /registrations/{userId} {
+      allow read, create: if request.auth != null
+                          && request.auth.uid == userId
+                          && !exists(/databases/$(database)/documents/registrations/$(userId));
+      allow update, delete: if false;
+    }
+
+    // ── Catch-all deny ───────────────────────────────────────────────────────
+    // Block every other collection path. This stops:
+    //   • Scrapers probing collections your app doesn't use
+    //   • Bots brute-forcing Firestore document paths
+    //   • Accidental data exposure if a new collection is added without rules
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
