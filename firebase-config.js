@@ -36,7 +36,7 @@ import {
 
 // ── Your Firebase project config ────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "AIzaSyBc0jyrxlCdA1mkDNN0u-VheCkGtskuaBw",
+  apiKey:            "AIzaSyCEfJSXZdB6j-KaFnowOBfz861p5oE2KDQ",
   authDomain:        "ciminds.firebaseapp.com",
   projectId:         "ciminds",
   storageBucket:     "ciminds.firebasestorage.app",
@@ -58,7 +58,7 @@ try {
     provider: new ReCaptchaV3Provider('6Lcu8jEtAAAAAFkM1CANjfPHRt20O38Tm7TlO2K_'),
     isTokenAutoRefreshEnabled: true
   });
-  /* [log removed in production] */
+  console.log('[CI Minds] App Check initialised — bot/DDoS protection active.');
 } catch (err) {
   console.warn('[CI Minds] App Check failed to initialise:', err.message);
 }
@@ -181,9 +181,9 @@ async function saveProgressToCloud(uid, progressData) {
       courseProgress: progressData,
       lastUpdated: serverTimestamp()
     }, { merge: true });
-    /* [log removed in production] */
+    console.log("[CI Minds] Progress saved to cloud:", Object.keys(progressData.progress || {}).length, "lessons completed");
   } catch (err) {
-    /* [log removed in production] */
+    console.error("[CI Minds] Cloud save FAILED — progress will not sync across devices:", err.message);
   }
 }
 
@@ -193,13 +193,13 @@ async function loadProgressFromCloud(uid) {
     const snap = await getDoc(doc(db, "users", uid));
     if (snap.exists() && snap.data().courseProgress) {
       const cp = snap.data().courseProgress;
-      /* [log removed in production] */
+      console.log("[CI Minds] Progress loaded from cloud:", Object.keys(cp.progress || {}).length, "lessons completed");
       return cp;
     }
-    /* [log removed in production] */
+    console.log("[CI Minds] No cloud progress found for this user yet.");
     return null;
   } catch (err) {
-    /* [log removed in production] */
+    console.error("[CI Minds] Cloud load FAILED:", err.message);
     return null;
   }
 }
@@ -212,7 +212,7 @@ async function checkRegistration(uid) {
     if (snap.exists()) return snap.data();
     return null;
   } catch (err) {
-    /* [log removed in production] */
+    console.error("[CI Minds] Registration check failed:", err.message);
     return null;
   }
 }
@@ -228,7 +228,7 @@ async function saveRegistration(uid, data) {
     });
     return true;
   } catch (err) {
-    /* [log removed in production] */
+    console.error("[CI Minds] Registration save FAILED:", err.message);
     return false;
   }
 }
@@ -236,7 +236,7 @@ async function saveRegistration(uid, data) {
 // ── Friendly error messages ──────────────────────────────────────────────────
 function getFriendlyError(code) {
   // Log the real code to console so it's easy to debug
-  /* [log removed in production] */
+  if (code) console.warn('[CI Minds Auth] Firebase error code:', code);
 
   const map = {
     // Sign-up errors
@@ -282,7 +282,7 @@ async function registerSession(uid, sessionId) {
       lastLogin: serverTimestamp()
     }, { merge: true });
   } catch (err) {
-    /* [log removed in production] */
+    console.warn("Session registration failed:", err.message);
   }
 }
 
@@ -293,7 +293,7 @@ function watchSession(uid, callback) {
       callback(snap.data().activeSessionId || null);
     }
   }, (err) => {
-    /* [log removed in production] */
+    console.warn("Session watch error:", err.message);
   });
 }
 
