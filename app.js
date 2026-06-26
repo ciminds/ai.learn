@@ -2109,7 +2109,9 @@ function init() {
     renderSidebar();
     navigate(state.view, state.activeLesson, false);
     updateNavProgress();
-    if (typeof window._cbkHideSplash === 'function') window._cbkHideSplash();
+    // NOTE: splash is hidden by payment.js AFTER auth is confirmed —
+    // never hide it here (before auth resolves) or unauthenticated users
+    // will briefly see the dashboard before being redirected.
 
     // Switch to the requested profile tab (e.g. Credentials Feed)
     if (_pendingProfileTab) {
