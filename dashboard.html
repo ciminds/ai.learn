@@ -303,17 +303,25 @@
     <!-- ── Payment & Auth Module (ESM) ── -->
     <script type="module" src="./assets/payment.js"></script>
 
-    <!-- ── Splash hide: fires after first render ── -->
+    <!-- ── Splash hide: fires ONLY after auth is confirmed ── -->
     <script>
         (function() {
-            // Hide splash once DOM is interactive and app has started rendering
+            // Hide splash ONLY after Firebase auth has resolved.
+            // No timer — prevents unauthenticated users from seeing
+            // dashboard content before being redirected to course.html.
             function hideSplash() {
                 const s = document.getElementById('cbk-splash');
                 if (s) s.classList.add('hidden');
             }
-            // Primary: hide after app's init() fires (max 2.5s safety net)
             window._cbkHideSplash = hideSplash;
-            setTimeout(hideSplash, 2500);
+            // Safety net: if auth takes more than 8 seconds something is
+            // genuinely wrong — redirect to course.html instead of hanging.
+            setTimeout(() => {
+                const s = document.getElementById('cbk-splash');
+                if (s && !s.classList.contains('hidden')) {
+                    window.location.href = 'course.html';
+                }
+            }, 8000);
         })();
     </script>
 

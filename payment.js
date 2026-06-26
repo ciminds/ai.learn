@@ -38,9 +38,13 @@ import {
 onAuthChange(async (user) => {
 
     if (!user) {
+        // No user — redirect immediately, keep splash visible
         window.location.href = 'course.html';
         return;
     }
+
+    // Auth confirmed — now safe to hide splash and show dashboard
+    if (typeof window._cbkHideSplash === 'function') window._cbkHideSplash();
 
     // Detect if init() rendered with a DIFFERENT user's data (e.g. a
     // different account just logged in on this browser). If so,
