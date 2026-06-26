@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI Fast-Track | CBK Innovative Minds</title>
+    <!-- ── Immediate auth guard — runs before ANY content renders ── -->
+    <script>
+        // Check localStorage for a previously signed-in user.
+        // If no uid found at all — redirect immediately without waiting
+        // for Firebase to load. This covers the pure incognito/stranger case
+        // instantly (< 1ms) with zero flash of dashboard content.
+        (function() {
+            var uid = sessionStorage.getItem('ci_uid') || localStorage.getItem('ci_last_uid');
+            if (!uid) {
+                window.location.replace('course.html');
+            }
+        })();
+    </script>
 
     <!-- ── SEO & Social ── -->
     <meta name="description" content="Learn AI tools, prompt engineering, and automation in 6 weeks. CBK Innovative Minds — India's premium AI skills platform.">
