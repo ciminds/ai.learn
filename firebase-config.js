@@ -36,7 +36,7 @@ import {
 
 // ── Your Firebase project config ────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "AIzaSyCEfJSXZdB6j-KaFnowOBfz861p5oE2KDQ",
+  apiKey:            "AIzaSyBc0jyrxlCdA1mkDNN0u-VheCkGtskuaBw",
   authDomain:        "ciminds.firebaseapp.com",
   projectId:         "ciminds",
   storageBucket:     "ciminds.firebasestorage.app",
