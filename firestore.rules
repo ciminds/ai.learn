@@ -15,14 +15,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Admin access ─────────────────────────────────────────────────────────
+    // Only the owner account (ceo.ciminds@gmail.com) can read all collections.
+    // Write access is still blocked — admin is read-only.
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.uid == 'zMr15dtQbIc1Y4IxQWr7w8tPrft1';
+    }
+
     // ── users/{userId} ──────────────────────────────────────────────────────
     // Profile, enrollment status, course progress, session ID.
     // Only the signed-in owner can read/write — but CANNOT touch
     // enrolled, foundingMember, or paymentId (server-only fields).
     match /users/{userId} {
 
-      // Read: owner only
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Read: owner only OR admin
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
 
       // Create: owner only, cannot set protected fields
       allow create: if request.auth != null
@@ -61,9 +69,11 @@ service cloud.firestore {
     //   allow update: if false this makes double-registration physically
     //   impossible — even if someone bypasses all client-side checks.
     match /registrations/{userId} {
-      allow read, create: if request.auth != null
-                          && request.auth.uid == userId
-                          && !exists(/databases/$(database)/documents/registrations/$(userId));
+      allow read: if request.auth != null
+                  && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && !exists(/databases/$(database)/documents/registrations/$(userId));
       allow update, delete: if false;
     }
 
