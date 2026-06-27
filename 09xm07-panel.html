@@ -240,6 +240,7 @@
 <!-- ── Firebase ── -->
 <script type="module">
 import { initializeApp }          from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app-check.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
                                    from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs, orderBy, limit }
@@ -256,13 +257,21 @@ const firebaseConfig = {
   measurementId:     "G-8BLH44L897"
 };
 
+const app  = initializeApp(firebaseConfig);
+
+// ── App Check — required since enforcement is enabled ────────────────────────
+try {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6Lcu8jEtAAAAAFkM1CANjfPHRt20O38Tm7TlO2K_'),
+    isTokenAutoRefreshEnabled: true
+  });
+} catch(e) { console.warn('AppCheck init failed:', e.message); }
 // ── ADMIN WHITELIST — add your email(s) here ─────────────────────────────────
 const ADMIN_EMAILS = [
     'ceo.ciminds@gmail.com'
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
-const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
