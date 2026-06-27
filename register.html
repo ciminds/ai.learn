@@ -402,6 +402,7 @@ h1,h2,h3{font-family:'Sora',sans-serif;margin:0 0 .4em;letter-spacing:-0.01em;}
   cookie policies, and never shows a "check popups" error message.
 ──────────────────────────────────────────────────────────────────────────── -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -417,7 +418,7 @@ h1,h2,h3{font-family:'Sora',sans-serif;margin:0 0 .4em;letter-spacing:-0.01em;}
 <script>
   // ── STEP 1: Replace with your real Firebase project config ──────────────────
   const FIREBASE_CONFIG = {
-    apiKey:            "AIzaSyCEfJSXZdB6j-KaFnowOBfz861p5oE2KDQ",
+    apiKey:            "AIzaSyBc0jyrxlCdA1mkDNN0u-VheCkGtskuaBw",
     authDomain: "ciminds.firebaseapp.com",
     projectId:         "ciminds",
     storageBucket:     "ciminds.firebasestorage.app",
@@ -431,6 +432,14 @@ h1,h2,h3{font-family:'Sora',sans-serif;margin:0 0 .4em;letter-spacing:-0.01em;}
 
   if (FIREBASE_CONFIGURED) {
     firebase.initializeApp(FIREBASE_CONFIG);
+    // App Check — required since enforcement is ON
+    try {
+      const appCheck = firebase.appCheck();
+      appCheck.activate(
+        new firebase.appCheck.ReCaptchaV3Provider('6Lcu8jEtAAAAAFkM1CANjfPHRt20O38Tm7TlO2K_'),
+        true
+      );
+    } catch(e) { console.warn('AppCheck init failed:', e.message); }
   }
 
   // ── Thin adapter so the rest of the code stays clean ───────────────────────
@@ -710,37 +719,14 @@ h1,h2,h3{font-family:'Sora',sans-serif;margin:0 0 .4em;letter-spacing:-0.01em;}
     }
 
     const name       = document.getElementById('name').value.trim();
-    const email      = document.getElementById('email').value.trim().toLowerCase();
-    const phone      = document.getElementById('phone').value.trim().replace(/\s/g, '');
+    const email      = document.getElementById('email').value.trim();
+    const phone      = document.getElementById('phone').value.trim();
     const occupation = document.getElementById('occupation').value;
 
-    // ── Input validation ─────────────────────────────────────────────────────
-    // Strip any HTML/script tags from name — prevents XSS injection
-    const nameSanitized = name.replace(/<[^>]*>/g, '').trim();
-
-    // Name: 2-100 chars, letters/spaces/hyphens/dots only, no scripts
-    if (!nameSanitized || nameSanitized.length < 2)
-      return showError('Please enter your full name (at least 2 characters).');
-    if (nameSanitized.length > 100)
-      return showError('Name is too long. Please enter your real name.');
-    if (!/^[a-zA-Z\u0900-\u097F\s\-'.]+$/.test(nameSanitized))
-      return showError('Name can only contain letters, spaces, hyphens, and dots.');
-
-    // Email: standard format check
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
-      return showError('Please enter a valid email address.');
-
-    // Phone: exactly 10 digits, not all same digit, valid Indian mobile prefix
-    if (!/^[0-9]{10}$/.test(phone))
-      return showError('Please enter a valid 10-digit phone number.');
-    if (/^(\d)\1{9}$/.test(phone))
-      return showError('Please enter a real phone number.');
-    if (!/^[6-9]/.test(phone))
-      return showError('Please enter a valid Indian mobile number (starts with 6-9).');
-
-    if (!occupation)
-      return showError('Please select your occupation.');
-    // ─────────────────────────────────────────────────────────────────────────
+    if (!name)                                            return showError('Please enter your full name.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))       return showError('Please enter a valid email address.');
+    if (!/^[0-9]{10}$/.test(phone))                       return showError('Please enter a valid 10-digit phone number.');
+    if (!occupation)                                       return showError('Please select your occupation.');
 
     // ── Rate limit: 3 payment attempts per 10 minutes ────────────────────────
     if (window.RateLimit && !window.RateLimit.checkRateLimit('payment-open')) {
