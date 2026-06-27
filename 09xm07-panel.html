@@ -245,10 +245,16 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
 import { getFirestore, collection, query, where, getDocs, orderBy, limit }
                                    from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-// ── Import your firebase config ──────────────────────────────────────────────
-// This admin panel must be served from an authorized domain.
-// It NEVER runs in production — use Firebase Hosting with IP restrictions.
-import { firebaseConfig } from './firebase-config.js';
+// ── Firebase config inline (updated API key) ─────────────────────────────────
+const firebaseConfig = {
+  apiKey:            "AIzaSyBc0jyrxlCdA1mkDNN0u-VheCkGtskuaBw",
+  authDomain:        "ciminds.firebaseapp.com",
+  projectId:         "ciminds",
+  storageBucket:     "ciminds.firebasestorage.app",
+  messagingSenderId: "630925853512",
+  appId:             "1:630925853512:web:808ec2cdbeb8720c29297d",
+  measurementId:     "G-8BLH44L897"
+};
 
 // ── ADMIN WHITELIST — add your email(s) here ─────────────────────────────────
 const ADMIN_EMAILS = [
