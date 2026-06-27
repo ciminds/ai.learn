@@ -336,8 +336,8 @@ window.loadAdminData = async function() {
         // ── Stats ──────────────────────────────────────────────────────────
         const totalEnrolled  = users.length;
         const foundingCount  = users.filter(u => u.foundingMember).length;
-        // Revenue: founding members paid ₹499, others ₹999
-        const revenue        = users.reduce((sum, u) => sum + (u.foundingMember ? 499 : 999), 0);
+        // Revenue: use actual amount paid stored in Firestore, fallback to 0
+        const revenue        = users.reduce((sum, u) => sum + (u.amount || 0), 0);
 
         // Completion: from cbkCourseState — approximate from progress keys
         let totalCompletion = 0;
