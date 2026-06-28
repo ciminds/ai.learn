@@ -842,6 +842,17 @@
       return { valid: true, error: '', value: sanitized };
     }
 
+    // ── Sanitize Firestore data before DOM injection ───────────────────────
+    function sanitize(str) {
+      if (typeof str !== 'string') return str || '—';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+    }
+
     // ── Verify against Firestore ───────────────────────────────────────────
     async function verifyCertificate(certId) {
       const snap = await getDoc(doc(db, 'certificates', certId));
@@ -921,9 +932,9 @@
           </div>
           <div class="result-body">
             <div class="cert-fields">
-              <div class="cert-field"><label>Certificate ID</label><div class="value mono">${data.certId}</div></div>
-              <div class="cert-field"><label>Student Name</label><div class="value">${data.studentName}</div></div>
-              <div class="cert-field"><label>Course</label><div class="value">${data.courseName}</div></div>
+              <div class="cert-field"><label>Certificate ID</label><div class="value mono">${sanitize(data.certId)}</div></div>
+              <div class="cert-field"><label>Student Name</label><div class="value">${sanitize(data.studentName)}</div></div>
+              <div class="cert-field"><label>Course</label><div class="value">${sanitize(data.courseName)}</div></div>
               <div class="cert-field"><label>Issue Date</label><div class="value">${fmtDate(data.issueDate)}</div></div>
             </div>
             <p style="font-size:13px;color:var(--text-muted);">If you have questions about this revocation, contact <a href="mailto:support@ciminds.in" style="color:var(--accent-light)">support@ciminds.in</a>.</p>
@@ -946,9 +957,9 @@
           </div>
           <div class="result-body">
             <div class="cert-fields">
-              <div class="cert-field"><label>Certificate ID</label><div class="value mono">${data.certId}</div></div>
-              <div class="cert-field"><label>Student Name</label><div class="value">${data.studentName}</div></div>
-              <div class="cert-field"><label>Course</label><div class="value">${data.courseName}</div></div>
+              <div class="cert-field"><label>Certificate ID</label><div class="value mono">${sanitize(data.certId)}</div></div>
+              <div class="cert-field"><label>Student Name</label><div class="value">${sanitize(data.studentName)}</div></div>
+              <div class="cert-field"><label>Course</label><div class="value">${sanitize(data.courseName)}</div></div>
               <div class="cert-field"><label>Expired On</label><div class="value">${fmtDate(data.expiresAt)}</div></div>
             </div>
           </div>
@@ -973,19 +984,19 @@
             <div class="cert-fields">
               <div class="cert-field">
                 <label>Student Name</label>
-                <div class="value">${data.studentName}</div>
+                <div class="value">${sanitize(data.studentName)}</div>
               </div>
               <div class="cert-field">
                 <label>Certificate ID</label>
-                <div class="value mono">${data.certId}</div>
+                <div class="value mono">${sanitize(data.certId)}</div>
               </div>
               <div class="cert-field">
                 <label>Course</label>
-                <div class="value">${data.courseName}</div>
+                <div class="value">${sanitize(data.courseName)}</div>
               </div>
               <div class="cert-field">
                 <label>Credential Level</label>
-                <div class="value">${data.credentialLevel || 'Professional Certificate'}</div>
+                <div class="value">${sanitize(data.credentialLevel || 'Professional Certificate')}</div>
               </div>
               <div class="cert-field">
                 <label>Completion Date</label>
@@ -997,7 +1008,7 @@
               </div>
               <div class="cert-field">
                 <label>Instructor</label>
-                <div class="value">${data.instructor || 'CI Minds Faculty'}</div>
+                <div class="value">${sanitize(data.instructor || 'CI Minds Faculty')}</div>
               </div>
               <div class="cert-field">
                 <label>Verified At</label>
@@ -1005,7 +1016,7 @@
               </div>
               <div class="cert-field full">
                 <label>Verification Hash</label>
-                <div class="hash-wrap">${data.verificationHash || '—'}</div>
+                <div class="hash-wrap">${sanitize(data.verificationHash || '—')}</div>
               </div>
             </div>
             <div class="divider" aria-hidden="true"></div>
