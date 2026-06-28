@@ -734,7 +734,7 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
             </svg>
-            Scan QR Code from Certificate
+            📷 Scan QR Code — Opens Camera
           </button>
         </div>
       </section>
@@ -1136,7 +1136,43 @@
 
     // ── QR Scan — opens camera via URL input ───────────────────────────────
     window.handleQRScan = function() {
-      showToast('Point your phone camera at the QR code on your certificate to verify instantly.');
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        // On mobile — open native camera via file input with environment capture
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment'; // rear camera
+        input.style.display = 'none';
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          showToast('Processing QR code…');
+          // Use ZXing via CDN to decode QR from image
+          try {
+            const ZXing = await import('https://cdn.jsdelivr.net/npm/@zxing/library@0.19.1/+esm');
+            const reader = new ZXing.BrowserQRCodeReader();
+            const imgUrl = URL.createObjectURL(file);
+            const result = await reader.decodeFromImageUrl(imgUrl);
+            URL.revokeObjectURL(imgUrl);
+            const text = result.getText();
+            // Extract cert ID from URL or use as-is
+            const match = text.match(/[?&]id=([A-Z0-9\-]+)/i);
+            const certId = match ? match[1].toUpperCase() : text.toUpperCase();
+            document.getElementById('cert-input').value = certId;
+            handleVerify();
+          } catch {
+            showToast('Could not read QR code. Please enter the Certificate ID manually.');
+          }
+        };
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+      } else {
+        // On desktop — open Google Lens in new tab
+        window.open('https://lens.google.com', '_blank');
+        showToast('Google Lens opened. Upload a photo of your certificate QR code.');
+      }
     };
 
     // ── Copy link ──────────────────────────────────────────────────────────
