@@ -2036,12 +2036,12 @@ let state = {
     enrolled: false,
     foundingMember: false,
     enrolledAt: null,
-    paymentId: null,       // true only after verified Razorpay payment
-    enrolledAt: null,
     paymentId: null,
-    streak: 0,             // consecutive days active
-    lastActiveDate: null   // ISO date string (YYYY-MM-DD) of last visit
+    streak: 0,
+    lastActiveDate: null
 };
+// Expose globally so payment.js (ESM module) can access it
+window.state = state;
 
 let examState = {
     questions: [],
@@ -3775,81 +3775,4 @@ window.addEventListener('DOMContentLoaded', function() {
         syncBottomNav((state.view === 'lesson') ? 'learn' : state.view);
     }, 50);
 });
-
-</script>
-
-<!-- ═══════════════════════════════════════════════════════════
- CERTIFICATE MODAL — renders cREAD.png with dynamic overlays
- ═══════════════════════════════════════════════════════════ -->
-<div id="cert-modal-overlay" class="hidden fixed inset-0 z-[100000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
-<div class="bg-cbk-surface rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col" style="max-height:92vh;">
-    <!-- Header -->
-    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-cbk shrink-0">
-        <h3 class="font-bold text-sm sm:text-lg text-cbk">Your Certificate</h3>
-                        ${state.foundingMember ? '<span class="text-xs font-bold px-2 py-0.5 rounded-full ml-2" style="background:rgba(99,102,241,0.2);color:#818CF8;">⭐ Founding Member</span>' : ''}
-        <button onclick="closeCertificateModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-500" aria-label="Close">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-    </div>
-
-    <!-- Certificate render area (this is what gets captured for download) -->
-    <div class="overflow-auto p-3 sm:p-6 bg-cbk-s2">
-        <div id="certificate-render" style="position:relative;width:100%;aspect-ratio:1.4149;background-image:url('certificate.jpg');background-size:cover;background-position:center;border-radius:6px;overflow:hidden;">
-            <!-- Name overlay — sits exactly on top of "STUDENT NAME", same white/weight, so it visually replaces it -->
-            <!-- Name overlay — plain white text, matches reference design exactly -->
-            <div id="cert-name-overlay" style="
-                position:absolute;
-                left:5.27%;
-                top:61.49%;
-                width:60%;
-                height:3.83%;
-                display:flex;
-                align-items:center;
-                font-family: Arial, Helvetica, sans-serif;
-                font-weight:500;
-                font-size: min(3.5vw, 3.5vh, 37px);
-                color:#ffffff;
-                letter-spacing:0.01em;
-                line-height:1;
-                white-space:nowrap;
-                overflow:hidden;
-            ">STUDENT NAME</div>
-
-            <!-- Date overlay — sits exactly on the black area below "DATE" label -->
-            <!-- Verifiable QR code — bottom right of certificate -->
-            <div style="position:absolute;bottom:3.5%;right:3.5%;display:flex;flex-direction:column;align-items:center;gap:2px;">
-                <img id="cert-qr-code" src="" alt="Verify certificate" style="width:9%;min-width:48px;max-width:80px;border-radius:4px;opacity:0.9;">
-                <span id="cert-verify-id" style="font-size:0.45em;color:rgba(0,0,0,0.5);font-family:monospace;letter-spacing:0.05em;"></span>
-            </div>
-
-            <div id="cert-date-overlay" style="
-                position:absolute;
-                right:5.1%;
-                top:88%;
-                width:30%;
-                font-family: Arial, Helvetica, sans-serif;
-                font-weight:600;
-                font-size:min(1.6vw, 1.6vh, 17px);
-                color:#cbd5e1;
-                letter-spacing:0.02em;
-                text-align:right;
-                line-height:1.2;
-                white-space:nowrap;
-            ">01 Jan 2026</div>
-        </div>
-    </div>
-
-    <!-- Footer actions -->
-    <div class="px-4 sm:px-6 py-3 sm:py-4 border-t border-cbk shrink-0 flex flex-col sm:flex-row gap-2 sm:gap-3">
-        <button id="cert-download-btn" onclick="downloadCertificate()" class="flex-1 bg-violet-dark hover:bg-violet text-white font-bold text-sm py-2.5 sm:py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            Download as PDF
-        </button>
-        <button onclick="window.open('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=AI+Power+User&organizationId=123456', '_blank')" class="flex-1 bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm py-2.5 sm:py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
-            Add to LinkedIn
-        </button>
-    </div>
-</div>
-</div>
 

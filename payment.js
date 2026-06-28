@@ -144,8 +144,8 @@ window.initiatePayment = function() {
                 resetEnrollBtn(); return;
             }
             if (btn) btn.textContent = 'Verifying payment…';
-            state.enrolled = true;
-            state.paymentId = response.razorpay_payment_id;
+            window.state.enrolled = true;
+            window.state.paymentId = response.razorpay_payment_id;
             try {
                 const key = 'cbkCourseState_' + _currentUser.uid;
                 const cur = JSON.parse(localStorage.getItem(key) || '{}');
@@ -200,7 +200,7 @@ onAuthChange(async (user) => {
         if (generic && !existing) { localStorage.setItem(userKey, generic); localStorage.removeItem(genericKey); }
     } catch(_) {}
 
-    // 5. Reload state if different user logged in
+    // 5. Reload window.state if different user logged in
     const _previousUid = localStorage.getItem('ci_last_uid');
     if (_previousUid && _previousUid !== user.uid) {
         try {
@@ -208,18 +208,18 @@ onAuthChange(async (user) => {
             const saved = localStorage.getItem(userKey);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                state = { ...state, ...parsed, expandedModules: parsed.expandedModules || ['m1'] };
+                window.state = { ...window.state, ...parsed, expandedModules: parsed.expandedModules || ['m1'] };
             } else {
-                state = { view: 'overview', activeLesson: null, progress: {}, quizScores: {}, expandedModules: ['m1'], enrolled: false, enrolledAt: null, paymentId: null, isFinished: false };
+                window.state = { view: 'overview', activeLesson: null, progress: {}, quizScores: {}, expandedModules: ['m1'], enrolled: false, enrolledAt: null, paymentId: null, isFinished: false };
             }
             renderSidebar();
-            navigate(state.view, state.activeLesson, false);
+            navigate(window.state.view, window.state.activeLesson, false);
         } catch(_) {}
     }
 
     // 6. Enrollment check
     window._recheckEnrollment = () => checkEnrollmentStatus(user, true);
-    if (state.enrolled === true) {
+    if (window.state.enrolled === true) {
         checkEnrollmentStatus(user);
     } else {
         await checkEnrollmentStatus(user);
@@ -252,7 +252,7 @@ onAuthChange(async (user) => {
     const refInput = document.getElementById('referral-link-input');
     if (refInput) refInput.value = `https://ciminds.in/ref/${(firstName + user.uid.slice(-2)).toUpperCase()}`;
 
-    if (state.view === 'profile' || state.view === 'dashboard') navigate(state.view, state.activeLesson, false);
+    if (window.state.view === 'profile' || window.state.view === 'dashboard') navigate(window.state.view, window.state.activeLesson, false);
 
     // 10. Inject sign out button
     const profileMenu = document.getElementById('profile-menu');
@@ -286,16 +286,16 @@ onAuthChange(async (user) => {
     try {
         const cloudData = await loadProgressFromCloud(user.uid);
         if (cloudData && cloudData.progress) {
-            const localCount = Object.keys(state.progress || {}).length;
+            const localCount = Object.keys(window.state.progress || {}).length;
             const cloudCount = Object.keys(cloudData.progress).length;
             if (cloudCount > localCount) {
-                const wasEnrolled = state.enrolled;
-                state = { ...state, ...cloudData, expandedModules: cloudData.expandedModules || ['m1'] };
-                if (wasEnrolled) state.enrolled = true;
+                const wasEnrolled = window.state.enrolled;
+                window.state = { ...window.state, ...cloudData, expandedModules: cloudData.expandedModules || ['m1'] };
+                if (wasEnrolled) window.state.enrolled = true;
                 const _urlForced = sessionStorage.getItem('_forceOverview');
-                if (!_urlForced && Object.keys(state.progress).length > 0 && state.view === 'overview') state.view = 'dashboard';
+                if (!_urlForced && Object.keys(window.state.progress).length > 0 && window.state.view === 'overview') window.state.view = 'dashboard';
                 renderSidebar();
-                navigate(state.view, state.activeLesson, false);
+                navigate(window.state.view, window.state.activeLesson, false);
                 updateNavProgress();
             }
         }
@@ -304,8 +304,8 @@ onAuthChange(async (user) => {
     // 14. Final safety pass
     setTimeout(async () => {
         await checkEnrollmentStatus(user, false);
-        if (state.enrolled && state.view === 'overview') {
-            state.view = 'dashboard';
+        if (window.state.enrolled && window.state.view === 'overview') {
+            window.state.view = 'dashboard';
             renderSidebar();
             navigate('dashboard', null, false);
         }
@@ -317,28 +317,28 @@ onAuthChange(async (user) => {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             const data = userDoc.exists() ? userDoc.data() : null;
             if (data && data.enrolled === true) {
-                const wasLocked = !state.enrolled;
-                state.enrolled       = true;
-                state.foundingMember = data.foundingMember || false;
-                state.enrolledAt     = data.enrolledAt || null;
-                state.paymentId      = data.paymentId  || null;
+                const wasLocked = !window.state.enrolled;
+                window.state.enrolled       = true;
+                window.state.foundingMember = data.foundingMember || false;
+                window.state.enrolledAt     = data.enrolledAt || null;
+                window.state.paymentId      = data.paymentId  || null;
                 try {
                     const lsKey = 'cbkCourseState_' + user.uid;
                     const existing = JSON.parse(localStorage.getItem(lsKey) || '{}');
-                    existing.enrolled = true; existing.paymentId = state.paymentId;
+                    existing.enrolled = true; existing.paymentId = window.state.paymentId;
                     localStorage.setItem(lsKey, JSON.stringify(existing));
                 } catch(_) {}
                 if (wasLocked || forceRender) {
                     renderSidebar();
-                    navigate(state.view === 'overview' ? 'dashboard' : state.view, state.activeLesson, false);
+                    navigate(window.state.view === 'overview' ? 'dashboard' : window.state.view, window.state.activeLesson, false);
                     if (forceRender) showToast('🎉 Access restored! Welcome back.', 'success');
                 }
-            } else if (state.enrolled === true) {
+            } else if (window.state.enrolled === true) {
                 try {
                     await setDoc(doc(db, 'users', user.uid), {
                         enrolled: true, foundingMember: true,
-                        enrolledAt: state.enrolledAt || serverTimestamp(),
-                        paymentId: state.paymentId || 'manual-resync-' + Date.now()
+                        enrolledAt: window.state.enrolledAt || serverTimestamp(),
+                        paymentId: window.state.paymentId || 'manual-resync-' + Date.now()
                     }, { merge: true });
                     if (forceRender) showToast('🎉 Access restored!', 'success');
                 } catch {
