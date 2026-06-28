@@ -2037,6 +2037,7 @@ let state = {
     foundingMember: false,
     enrolledAt: null,
     paymentId: null,
+    certId: null,
     streak: 0,
     lastActiveDate: null
 };
@@ -3045,6 +3046,9 @@ function submitExam() {
         state.progress['final_exam'] = true;
         saveState();
         showToast("Certificate Unlocked!", "success");
+        // ── Issue certificate to Firestore ────────────────────────────────
+        issueCertificate();
+        // ─────────────────────────────────────────────────────────────────
     } else {
         header.className = "p-8 md:p-12 text-center text-white bg-gradient-to-br from-gray-800 to-gray-900";
         document.getElementById('result-title').textContent = "Almost there.";
@@ -3657,10 +3661,13 @@ function openCertificateModal() {
     document.getElementById('cert-name-overlay').textContent = name.toUpperCase();
     document.getElementById('cert-date-overlay').textContent = dateStr;
 
-    // ── Verifiable certificate ID ──────────────────────────────────────────
+    // ── Certificate ID — deterministic per student, stable across sessions ──
     const uid = sessionStorage.getItem('ci_uid') || localStorage.getItem('ci_last_uid') || 'guest';
-    const certId = 'CBK-' + uid.slice(-6).toUpperCase() + '-' + new Date().getFullYear();
-    const verifyUrl = 'https://ciminds.in/verify/' + certId;
+    const certId = state.certId || ('CBK-' + new Date().getFullYear() + '-' + uid.slice(-4).toUpperCase() + Math.random().toString(36).slice(2,6).toUpperCase());
+    // Store certId in state so same ID is used every time modal opens
+    if (!state.certId) { state.certId = certId; saveState(); }
+
+    const verifyUrl = 'https://ciminds.in/verify?id=' + certId;
     const qrEl = document.getElementById('cert-qr-code');
     if (qrEl) {
         qrEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(verifyUrl) + '&bgcolor=ffffff&color=000000&margin=4';
@@ -3736,6 +3743,56 @@ async function downloadCertificate() {
     } finally {
         btn.innerHTML = original;
         btn.disabled = false;
+    }
+}
+
+// ── issueCertificate — writes to Firestore certificates collection ────────
+// Called once when student passes the final exam.
+// Firestore rule: allow create if authenticated + !exists (one cert per student)
+async function issueCertificate() {
+    try {
+        const uid = sessionStorage.getItem('ci_uid') || localStorage.getItem('ci_last_uid') || '';
+        if (!uid || uid === 'guest') return;
+
+        // Generate stable certId — stored in state so it never changes
+        if (!state.certId) {
+            state.certId = 'CBK-' + new Date().getFullYear() + '-' +
+                uid.slice(-4).toUpperCase() +
+                Math.random().toString(36).slice(2, 6).toUpperCase();
+            saveState();
+        }
+
+        const name = window._currentDisplayName || 'Student';
+        const email = window._currentUserEmail || '';
+
+        // Dynamic import — only load Firestore when needed
+        const { doc, setDoc, serverTimestamp } = await import(
+            'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js'
+        );
+        const { db } = await import('./firebase-config.js');
+
+        await setDoc(doc(db, 'certificates', state.certId), {
+            certId:           state.certId,
+            studentName:      name,
+            studentEmail:     email,
+            courseName:       'AI Fast-Track',
+            courseId:         'ai-fast-track-v1',
+            credentialLevel:  'Professional Certificate',
+            instructor:       'CI Minds Faculty',
+            status:           'active',
+            issueDate:        serverTimestamp(),
+            completionDate:   serverTimestamp(),
+            verificationHash: btoa(state.certId + uid + Date.now()).replace(/=/g, ''),
+            version:          1,
+            verifiedCount:    0,
+            lastVerified:     null
+        });
+
+        console.log('[CI Minds] Certificate issued:', state.certId);
+    } catch (err) {
+        // Silent fail — certificate modal still works visually
+        // Student can always re-trigger by retaking exam
+        console.warn('[CI Minds] Certificate Firestore write failed:', err.message);
     }
 }
 

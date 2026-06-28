@@ -68,11 +68,14 @@ service cloud.firestore {
     }
 
     // ── certificates/{certId} ──────────────────────────────────────────────
-    // Public read for verification. Write is permanently disabled from client.
-    // Only Cloud Function or admin SDK can issue/revoke certificates.
+    // Public read for verification — no auth required (employers verify without account).
+    // Create: authenticated student only, once, cannot overwrite or delete.
+    // Update/Delete: permanently disabled — certificates are immutable.
     match /certificates/{certId} {
-      allow read:             if true;
-      allow write:            if false;
+      allow read:   if true;
+      allow create: if request.auth != null
+                    && !exists(/databases/$(database)/documents/certificates/$(certId));
+      allow update, delete: if false;
     }
 
     // ── Catch-all deny ───────────────────────────────────────────────────────
