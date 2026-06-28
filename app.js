@@ -3668,13 +3668,22 @@ function openCertificateModal() {
     if (!state.certId) { state.certId = certId; saveState(); }
 
     const verifyUrl = 'https://ciminds.in/verify?id=' + certId;
+
+    // ── QR code — make it clickable to open verify page ──────────────────
     const qrEl = document.getElementById('cert-qr-code');
     if (qrEl) {
         qrEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(verifyUrl) + '&bgcolor=ffffff&color=000000&margin=4';
         qrEl.alt = 'Verify at ' + verifyUrl;
+        qrEl.style.cursor = 'pointer';
+        qrEl.onclick = () => window.open(verifyUrl, '_blank');
+        qrEl.title = 'Click to verify certificate';
     }
+
+    // ── Cert ID — show as clickable link ─────────────────────────────────
     const certIdEl = document.getElementById('cert-verify-id');
-    if (certIdEl) certIdEl.textContent = certId;
+    if (certIdEl) {
+        certIdEl.innerHTML = `<a href="${verifyUrl}" target="_blank" style="color:#6366f1;text-decoration:underline;cursor:pointer;">${certId}</a>`;
+    }
 
     const overlay = document.getElementById('cert-modal-overlay');
     overlay.classList.remove('hidden');
