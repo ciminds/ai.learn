@@ -208,9 +208,9 @@ onAuthChange(async (user) => {
             const saved = localStorage.getItem(userKey);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                window.state = { ...window.state, ...parsed, expandedModules: parsed.expandedModules || ['m1'] };
+                Object.assign(window.state, parsed, { expandedModules: parsed.expandedModules || ['m1'] });
             } else {
-                window.state = { view: 'overview', activeLesson: null, progress: {}, quizScores: {}, expandedModules: ['m1'], enrolled: false, enrolledAt: null, paymentId: null, isFinished: false };
+                Object.assign(window.state, { view: 'overview', activeLesson: null, progress: {}, quizScores: {}, expandedModules: ['m1'], enrolled: false, enrolledAt: null, paymentId: null, isFinished: false });
             }
             renderSidebar();
             navigate(window.state.view, window.state.activeLesson, false);
@@ -290,7 +290,7 @@ onAuthChange(async (user) => {
             const cloudCount = Object.keys(cloudData.progress).length;
             if (cloudCount > localCount) {
                 const wasEnrolled = window.state.enrolled;
-                window.state = { ...window.state, ...cloudData, expandedModules: cloudData.expandedModules || ['m1'] };
+                Object.assign(window.state, cloudData, { expandedModules: cloudData.expandedModules || ['m1'] });
                 if (wasEnrolled) window.state.enrolled = true;
                 const _urlForced = sessionStorage.getItem('_forceOverview');
                 if (!_urlForced && Object.keys(window.state.progress).length > 0 && window.state.view === 'overview') window.state.view = 'dashboard';

@@ -2040,7 +2040,8 @@ let state = {
     streak: 0,
     lastActiveDate: null
 };
-// Expose globally so payment.js (ESM module) can access it
+// Expose globally so payment.js (ESM module) can access AND update it.
+// Both `state` and `window.state` point to the SAME object in memory.
 window.state = state;
 
 let examState = {
@@ -2077,7 +2078,7 @@ function init() {
         const saved = localStorage.getItem(key);
         if (saved) {
             const parsed = JSON.parse(saved);
-            state = { ...state, ...parsed, expandedModules: parsed.expandedModules || ['m1'] };
+            Object.assign(state, parsed, { expandedModules: parsed.expandedModules || ['m1'] });
             // enrolled:true is permanent — never downgrade
             if (parsed.enrolled === true) state.enrolled = true;
             // Only auto-advance to dashboard if not coming from "View Course" link
@@ -2109,7 +2110,7 @@ function init() {
     renderSidebar();
     navigate(state.view, state.activeLesson, false);
     updateNavProgress();
-    if (typeof window._cbkHideSplash === 'function') window._cbkHideSplash();
+    // NOTE: splash hidden by payment.js AFTER auth+enrollment confirmed only
 
     // Switch to the requested profile tab (e.g. Credentials Feed)
     if (_pendingProfileTab) {
@@ -2313,7 +2314,8 @@ function showToast(message, type = 'success') {
 
 function navigate(view, payload = null, animate = true) {
     // ── PAYWALL GATE: block course access until enrolled ───────────────
-    if (!state.enrolled && (view === 'dashboard' || view === 'lesson' || view === 'projects' || view === 'exam')) {
+    // Use window.state so payment.js (ESM module) updates are visible here
+    if (!window.state.enrolled && (view === 'dashboard' || view === 'lesson' || view === 'projects' || view === 'exam')) {
         view = 'overview';
         payload = null;
         showToast('Enroll to unlock the full course.', 'info');
